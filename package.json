@@ -1,0 +1,50 @@
+{
+  "name": "@yuki153/react-spatial-navigation",
+  "version": "1.0.0",
+  "description": "React 17 compatible navigation library rewritten based on @noriginmedia/react-spatial-navigation",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "types": "types/lib/index.d.ts",
+  "file": [
+    "dist",
+    "types/**/*",
+    "!types/demo",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && cross-env DEBUG=\"1\" vite build",
+    "serve": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuki153/react-spatial-navigation.git"
+  },
+  "keywords": [
+    "react",
+    "spatial-navigation",
+    "hoc",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.13",
+    "@vitejs/plugin-react": "^1.2.0",
+    "cross-env": "^7.0.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^4.6.2",
+    "vite": "^2.8.6"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
+  },
+  "dependencies": {
+    "mabiki": "^1.0.1"
+  }
+}
