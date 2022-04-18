@@ -28,14 +28,6 @@ const Navi = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
 
     return (
         <div className={`navi${props.hasFocusedChild ? space + "is-focus" : ""}`} ref={ref}>
-            <FocusableNaviItem onCustomPress={(value) => {
-                if (value === "debug") {
-                    window.alert("Fire onCustomPress")
-                }
-            }}>onCustomPress (keyCode 48)</FocusableNaviItem>
-            <FocusableNaviItem onBackPress={() => {
-                window.alert("Fire onBackPress");
-            }}>onBackPress</FocusableNaviItem>
             <FocusableNaviItem onEnterPress={() => {
                 window.alert("Fire onEnterPress");
             }}>onEnterPress</FocusableNaviItem>

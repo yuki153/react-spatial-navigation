@@ -43,9 +43,7 @@ export const withFocusable = ({
             onEnterRelease = noop,
             onBecameFocused = noop,
             onBecameBlurred = noop,
-            onBackPress = noop,
             onArrowPress = noop,
-            onCustomPress = noop,
             ...props
         } = p2;
         const isFirstRender = useRef(true);
@@ -90,8 +88,6 @@ export const withFocusable = ({
                 focusable,
                 onEnterReleaseHandler: () => onEnterRelease(receivedProps),
                 onEnterPressHandler: (pressedKeys) => onEnterPress(receivedProps, pressedKeys),
-                onBackPressHandler: (pressedKeys) => onBackPress(receivedProps, pressedKeys),
-                onCustomPressHandler: (customValue, pressedKeys) => onCustomPress(customValue, receivedProps, pressedKeys),
                 onArrowPressHandler: (dir, pressedKeys) => onArrowPress(dir, receivedProps, pressedKeys),
                 onBecameBlurredHandler: (layout, details) => onBecameBlurred(layout, receivedProps, details),
                 onBecameFocusedHandler: (layout, details) => onBecameFocused(layout, receivedProps, details),

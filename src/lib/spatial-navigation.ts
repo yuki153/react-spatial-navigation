@@ -8,7 +8,6 @@ const DIRECTION_RIGHT = 'right';
 const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
-const KEY_BACK = 'back';
 
 /** アクションに対して複数の keycode を登録可能 */
 const DEFAULT_KEY_MAP = {
@@ -17,7 +16,6 @@ const DEFAULT_KEY_MAP = {
     [DIRECTION_RIGHT]: [39, "ArrowRight"],
     [DIRECTION_DOWN]: [40, "ArrowDown"],
     [KEY_ENTER]: [13, "Enter"],
-    [KEY_BACK]: [8, "Backspace"]
 };
 
 const OVERLAP_THRESHOLD = 0.2;
@@ -40,7 +38,7 @@ const MAIN_COORDINATE_WEIGHT = 5;
 
 type Keys = keyof typeof DEFAULT_KEY_MAP; 
 
-export type DirectionKeys = keyof Omit<typeof DEFAULT_KEY_MAP, "enter" | "back">
+export type DirectionKeys = keyof Omit<typeof DEFAULT_KEY_MAP, "enter">
 
 type LineSegment = {
     begin: {
@@ -82,10 +80,8 @@ export type PublicComponentProps = {
     forgetLastFocusedChild?: boolean;
     trackChildren?: boolean;
     blockNavigationOut?: boolean;
-    onBackPress?: (ownProps: FocusableProps, pressedKeys: PressedKeys) => void;
     onEnterPress?: (ownProps: FocusableProps, pressedKeys: PressedKeys) => void;
     onEnterRelease?: (ownProps: FocusableProps) => void;
-    onCustomPress?: (customValue: string, ownProps: FocusableProps, pressedKeys: PressedKeys) => void;
     onArrowPress?: (dir: DirectionKeys, ownProps: FocusableProps, pressedKeys: PressedKeys) => void | false;
     onBecameFocused?: (layout: Component["layout"], ownProps: FocusableProps, details: Details) => void;
     onBecameBlurred?: (layout: Component["layout"], ownProps: FocusableProps, details: Details) => void;
@@ -103,10 +99,8 @@ export type ComponentProps = {
     forgetLastFocusedChild: boolean;
     trackChildren: boolean;
     autoRestoreFocus: Boolean,
-    onBackPressHandler: (pressedKeys: PressedKeys) => void;
     onEnterPressHandler: (pressedKeys: PressedKeys) => void;
     onEnterReleaseHandler: () => void;
-    onCustomPressHandler: (customValue: string, pressedKeys: PressedKeys) => void;
     onArrowPressHandler: (dir: DirectionKeys, pressedKeys: PressedKeys) => void | false;
     onBecameFocusedHandler: (layout: Component["layout"], details: Details) => void;
     onBecameBlurredHandler: (layout: Component["layout"], details: Details) => void;
@@ -156,7 +150,6 @@ class SpatialNavigation {
     private pressedKeys: PressedKeys["pressedKeys"] = {};
     
     private keyMap = DEFAULT_KEY_MAP;
-    private customKeyMap: Record<string, (number|string)[]> | null = null;
 
     /** window.addEventListener 内での this はデフォルトで window を参照するため this の値を固定する */
     private eventHandler = {
@@ -200,12 +193,6 @@ class SpatialNavigation {
     public setKeyMap(keys: typeof DEFAULT_KEY_MAP) {
         this.keyMap = {
             ...DEFAULT_KEY_MAP,
-            ...keys
-        }
-    }
-
-    public setCustomKeyMap(keys: Record<string, number[]>) {
-        this.customKeyMap = {
             ...keys
         }
     }
@@ -416,26 +403,20 @@ class SpatialNavigation {
         return null;
     }
 
-    private getCustomEventType(keyCode: number | string) {
-        return this.customKeyMap && this.getEventType(keyCode, this.customKeyMap)
-    }
-
     private keyDownEvent(event: KeyboardEvent) {
         const focusKey = this.focusKey;
         if (this.paused || !focusKey) {
             return;
         }
 
-        const customEventType = this.getCustomEventType(event.keyCode || event.key);
-
         const eventType = this.getEventType(event.keyCode || event.key);
 
-        if (!eventType && !customEventType) {
+        if (!eventType) {
             return;
         }
 
-        const pressedEventType = this.pressedKeys[(eventType || customEventType) as string];
-        this.pressedKeys[(eventType || customEventType) as string] = pressedEventType ? pressedEventType + 1 : 1;
+        const pressedEventType = this.pressedKeys[eventType];
+        this.pressedKeys[eventType] = pressedEventType ? pressedEventType + 1 : 1;
 
         event.preventDefault();
         event.stopPropagation();
@@ -444,19 +425,8 @@ class SpatialNavigation {
             pressedKeys: this.pressedKeys
         };
 
-        // eventType が null という事は customEventType が null でない事を示す
-        if (eventType === null) {
-            this.onCustomPress(focusKey, customEventType as string, details)
-            return;
-        }
-
         if(eventType === KEY_ENTER) {
             this.onEnterPress(focusKey, details);
-            return;
-        }
-
-        if(eventType === KEY_BACK) {
-            this.onBackPress(focusKey, details);
             return;
         }
 
@@ -697,10 +667,8 @@ class SpatialNavigation {
         forgetLastFocusedChild,
         trackChildren,
         autoRestoreFocus,
-        onBackPressHandler,
         onEnterPressHandler,
         onEnterReleaseHandler,
-        onCustomPressHandler,
         onArrowPressHandler,
         onBecameFocusedHandler,
         onBecameBlurredHandler,
@@ -717,10 +685,8 @@ class SpatialNavigation {
             forgetLastFocusedChild,
             trackChildren,
             autoRestoreFocus,
-            onBackPressHandler,
             onEnterPressHandler,
             onEnterReleaseHandler,
-            onCustomPressHandler,
             onArrowPressHandler,
             onBecameFocusedHandler,
             onBecameBlurredHandler,
@@ -902,15 +868,6 @@ class SpatialNavigation {
         component.onEnterReleaseHandler && component.onEnterReleaseHandler();
     }
 
-    private onCustomPress(focusKey: string, customKey: string, pressedKeys: PressedKeys) {
-        const component = this.focusableComponents[focusKey];
-        if (!component || !component.focusable) {
-            console.log('onCustomPress', 'noComponent or componentNotFocusable');
-            return;
-        }
-        component.onCustomPressHandler && component.onCustomPressHandler(customKey, pressedKeys);
-    }
-
     private onEnterPress(focusKey: string, pressedKeys: PressedKeys) {
         const component = this.focusableComponents[focusKey];
         if (!component || !component.focusable) {
@@ -919,15 +876,6 @@ class SpatialNavigation {
         }
         component.onEnterPressHandler && component.onEnterPressHandler(pressedKeys);
     }
-
-    private onBackPress(focusKey: string, pressedKeys: PressedKeys) {
-        const component = this.focusableComponents[focusKey];
-        if (!component || !component.focusable) {
-            console.log('onBackPress', 'noComponent or componentNotFocusable');
-            return;
-        }
-        component.onBackPressHandler && component.onBackPressHandler(pressedKeys);
-    } 
 
     private onArrowPress(focusKey: string, direction: DirectionKeys, pressedKeys: PressedKeys): void | false {
         const component = this.focusableComponents[focusKey];
