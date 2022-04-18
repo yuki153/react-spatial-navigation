@@ -28,8 +28,8 @@ module.exports = defineConfig(() => {
             modules: false,
             targets: {
               chrome: "40",
-            },
-            debug: true,
+            }, 
+            debug: false,
           }],
         ],
       }),
