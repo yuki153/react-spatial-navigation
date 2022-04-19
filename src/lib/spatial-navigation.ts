@@ -36,6 +36,8 @@ const SEPARATE_GAP_WEIGHT = 1;
  */
 const MAIN_COORDINATE_WEIGHT = 5;
 
+export const FOCUSED_CLASS_NAME = "is-spatial-focused";
+
 type Keys = keyof typeof DEFAULT_KEY_MAP; 
 
 export type DirectionKeys = keyof Omit<typeof DEFAULT_KEY_MAP, "enter">
@@ -60,6 +62,7 @@ type Details = Partial<Record<"event", KeyboardEvent>>;
 type PressedKeys = { pressedKeys: Partial<Record<string, number>> };
 
 export type FocusableProps = {
+    className: typeof FOCUSED_CLASS_NAME | "";
     focusKey: string | null,
     realFocusKey: string;
     parentFocusKey: string;

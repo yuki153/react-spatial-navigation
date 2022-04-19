@@ -1,16 +1,16 @@
 import { ForwardedRef, forwardRef } from "react";
 import { FocusableProps, withFocusable } from "../../lib";
 
-const MainItem = ({ focused }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const MainItem = ({ className }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     const space = " ";
-    return <div className={`contentMainItem${focused ? space + "is-focus" : ""}`} ref={ref}/>
+    return <div className={`contentMainItem${className && space + className}`} ref={ref}/>
 };
 
 const FocusableMainItem = withFocusable()(forwardRef(MainItem))
 
-const Item = ({ focused }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const Item = ({ className }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     const space = " ";
-    return <div className={`contentItem${focused ? space + "is-focus" : ""}`} ref={ref}/>
+    return <div className={`contentItem${className && space + className}`} ref={ref}/>
 };
 
 const FocusableItem = withFocusable()(forwardRef(Item))

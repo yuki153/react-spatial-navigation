@@ -17,7 +17,7 @@ html {
     box-sizing: border-box;
 }
 
-.navi.is-focus {
+.navi.is-spatial-focused {
     border: 2px solid blue;
 }
 
@@ -28,7 +28,7 @@ html {
     background-color: #333;
 }
 
-.naviItem.is-focus {
+.naviItem.is-spatial-focused {
     background-color: blue;
 }
 
@@ -58,7 +58,7 @@ html {
     background-color: #333;
 }
 
-.contentMainItem.is-focus {
+.contentMainItem.is-spatial-focused {
     background-color: blue;
 }
 
@@ -72,6 +72,6 @@ html {
     margin-left: 16px;
 }
 
-.contentItem.is-focus {
+.contentItem.is-spatial-focused {
     background-color: blue;
 }

@@ -12,7 +12,8 @@ import {
     type PublicComponentProps,
     type FocusableProps,
     spatialNavigation,
-    ROOT_FOCUS_KEY
+    ROOT_FOCUS_KEY,
+    FOCUSED_CLASS_NAME
 } from "./spatial-navigation";
 import {
     issueUniqueId
@@ -32,6 +33,8 @@ export const withFocusable = ({
     const FocusableComponent = (p2: PublicComponentProps & Omit<T, keyof FocusableProps>) => {
         const noop = () => {};
         const {
+            // @ts-ignore
+            className = "",
             focusKey = null,
             preferredChildFocusKey = null,
             forgetLastFocusedChild = false,
@@ -52,11 +55,13 @@ export const withFocusable = ({
         const ref = useRef<HTMLElement>(null);
         const [focused, setFocused] = useState(false);
         const [hasFocusedChild, setHasFocusedChild] = useState(false);
+
         /**
          * receivedProps が 'T' の SubType でない事を明示化する。ジェネリクス(T)として渡された型（自身）へ as T を用いて変換する
          * TS Error の解消：型 'T' の制約に代入できますが、'T' は制約 'FocusableProps' の別のサブタイプでインスタンス化できることがあります
          */
         const receivedProps = {
+            className: focused ? (className ? `${className} ${FOCUSED_CLASS_NAME}` : FOCUSED_CLASS_NAME) : className,
             focusKey: focusKey || null,
             realFocusKey,
             parentFocusKey,
@@ -112,7 +117,7 @@ export const withFocusable = ({
         })
         return (
             <Context.Provider value={{parentFocusKey: realFocusKey}}>
-                <Component {...receivedProps} {...props as T} ref={ref}/>
+                <Component {...props as T} {...receivedProps} ref={ref}/>
             </Context.Provider>
         );
     };
