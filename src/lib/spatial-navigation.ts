@@ -2,6 +2,8 @@ import { throttle } from "mabiki";
 import { measureLayout } from "./measure-layout.js";
 
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
+export const FOCUSED_CLASS_NAME = "is-spatial-focused";
+export const FOCUSED_SELECTOR_NAME = ".is-spatial-focused";
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -35,8 +37,6 @@ const SEPARATE_GAP_WEIGHT = 1;
  * Main coordinate distance is 5 times more important
  */
 const MAIN_COORDINATE_WEIGHT = 5;
-
-export const FOCUSED_CLASS_NAME = "is-spatial-focused";
 
 type Keys = keyof typeof DEFAULT_KEY_MAP; 
 
