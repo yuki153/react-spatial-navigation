@@ -1,8 +1,8 @@
-import { spatialNavigation } from "../lib";
+import { initNavigation } from "../lib";
 import { FocusableNavi } from "./components/navi";
 import { FocusableContents } from "./components/contents";
 
-spatialNavigation.init({});
+initNavigation();
 
 export const App = () => {
     return (
