@@ -1,6 +1,8 @@
-# react-spatial-navigation
+# react-spatial-navigation。
 
-[@noriginmedia/react-spatial-navigation](https://github.com/NoriginMedia/react-spatial-navigation) を TypeScript で書き直し React 17 に対応させました。hooks ではなく HOC base なライブラリです。
+このライブラリは NoriginMedia が開発した [@noriginmedia/react-spatial-navigation](https://github.com/NoriginMedia/react-spatial-navigation) がベースになります。このような素晴らしいライブラリを公開された NoriginMedia に敬意を表すとともに深く感謝します。
+
+@noriginmedia/react-spatial-navigation を TypeScript で書き直し React 17 に対応させました。hooks ではなく HOC base なライブラリです。
 
 ## オリジナルとの差分比較
 
