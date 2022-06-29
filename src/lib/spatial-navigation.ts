@@ -159,6 +159,11 @@ class SpatialNavigation {
         keyDownEvent: this.keyDownEvent.bind(this),
         keyUpEvent: this.keyUpEvent.bind(this),
     }
+    
+    constructor() {
+        this.init = this.init.bind(this);
+        this.setKeyMap = this.setKeyMap.bind(this);
+    }
 
     public init({
         throttle: _throttle = 0,
