@@ -31,6 +31,9 @@ const Navi = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
             <FocusableNaviItem onEnterPress={() => {
                 window.alert("Fire onEnterPress");
             }}>onEnterPress</FocusableNaviItem>
+            <FocusableNaviItem onBackPress={() => {
+                window.alert("Fire onBackPress");
+            }}>onBackPress</FocusableNaviItem>
             <FocusableNaviItem onArrowPress={(dir, { navigateByDirection }) => {
                 navigateByDirection(dir);
                 return false;
