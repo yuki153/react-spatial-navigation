@@ -10,6 +10,7 @@ const DIRECTION_RIGHT = 'right';
 const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
+const KEY_BACK = 'back';
 
 /** アクションに対して複数の keycode を登録可能 */
 const DEFAULT_KEY_MAP = {
@@ -18,6 +19,7 @@ const DEFAULT_KEY_MAP = {
     [DIRECTION_RIGHT]: [39, "ArrowRight"],
     [DIRECTION_DOWN]: [40, "ArrowDown"],
     [KEY_ENTER]: [13, "Enter"],
+    [KEY_BACK]: [8, "Backspace"]
 };
 
 const OVERLAP_THRESHOLD = 0.2;
@@ -40,7 +42,7 @@ const MAIN_COORDINATE_WEIGHT = 5;
 
 type Keys = keyof typeof DEFAULT_KEY_MAP; 
 
-export type DirectionKeys = keyof Omit<typeof DEFAULT_KEY_MAP, "enter">
+export type DirectionKeys = keyof Omit<typeof DEFAULT_KEY_MAP, "enter" | "back">
 
 type LineSegment = {
     begin: {
@@ -83,6 +85,7 @@ export type PublicComponentProps = {
     forgetLastFocusedChild?: boolean;
     trackChildren?: boolean;
     blockNavigationOut?: boolean;
+    onBackPress?: (ownProps: FocusableProps, pressedKeys: PressedKeys) => void | false;
     onEnterPress?: (ownProps: FocusableProps, pressedKeys: PressedKeys) => void;
     onEnterRelease?: (ownProps: FocusableProps) => void;
     onArrowPress?: (dir: DirectionKeys, ownProps: FocusableProps, pressedKeys: PressedKeys) => void | false;
@@ -102,6 +105,7 @@ export type ComponentProps = {
     forgetLastFocusedChild: boolean;
     trackChildren: boolean;
     autoRestoreFocus: Boolean,
+    onBackPressHandler: (pressedKeys: PressedKeys) => void | false;
     onEnterPressHandler: (pressedKeys: PressedKeys) => void;
     onEnterReleaseHandler: () => void;
     onArrowPressHandler: (dir: DirectionKeys, pressedKeys: PressedKeys) => void | false;
@@ -154,7 +158,7 @@ class SpatialNavigation {
     
     private keyMap = DEFAULT_KEY_MAP;
 
-    /** window.addEventListener 内での this はデフォルトで window を参照するため this の値を固定する */
+    /** document.addEventListener 内での this はデフォルトで window を参照するため this の値を固定する */
     private eventHandler = {
         keyDownEvent: this.keyDownEvent.bind(this),
         keyUpEvent: this.keyUpEvent.bind(this),
@@ -426,12 +430,23 @@ class SpatialNavigation {
         const pressedEventType = this.pressedKeys[eventType];
         this.pressedKeys[eventType] = pressedEventType ? pressedEventType + 1 : 1;
 
-        event.preventDefault();
-        event.stopPropagation();
-
         const details = {
             pressedKeys: this.pressedKeys
         };
+
+        if(eventType === KEY_BACK) {
+            const stopPropagation = this.onBackPress(focusKey, details);
+            if (stopPropagation === false) {
+                event.preventDefault();
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         if(eventType === KEY_ENTER) {
             this.onEnterPress(focusKey, details);
@@ -470,15 +485,15 @@ class SpatialNavigation {
      */
     private bindEventHandlers() {
         if (typeof window !== 'undefined') {
-            window.addEventListener("keydown", this.eventHandler.keyDownEvent);
-            window.addEventListener("keyup", this.eventHandler.keyUpEvent);
+            document.addEventListener("keydown", this.eventHandler.keyDownEvent);
+            document.addEventListener("keyup", this.eventHandler.keyUpEvent);
         }
     }
 
     private unbindEventHandlers() {
         if (typeof window !== 'undefined') {
-            window.removeEventListener("keydown", this.eventHandler.keyDownEvent);
-            window.removeEventListener("keyup", this.eventHandler.keyUpEvent);
+            document.removeEventListener("keydown", this.eventHandler.keyDownEvent);
+            document.removeEventListener("keyup", this.eventHandler.keyUpEvent);
         }
     }
 
@@ -675,6 +690,7 @@ class SpatialNavigation {
         forgetLastFocusedChild,
         trackChildren,
         autoRestoreFocus,
+        onBackPressHandler,
         onEnterPressHandler,
         onEnterReleaseHandler,
         onArrowPressHandler,
@@ -693,6 +709,7 @@ class SpatialNavigation {
             forgetLastFocusedChild,
             trackChildren,
             autoRestoreFocus,
+            onBackPressHandler,
             onEnterPressHandler,
             onEnterReleaseHandler,
             onArrowPressHandler,
@@ -869,11 +886,20 @@ class SpatialNavigation {
 
     private onEnterRelease(focusKey: string) {
         const component = this.focusableComponents[focusKey];
-        if (!component || component.focusable) {
+        if (!component || !component.focusable) {
             console.log("onEnterRelease", 'noComponent or componentNotFocusable');
             return;
         }
         component.onEnterReleaseHandler && component.onEnterReleaseHandler();
+    }
+
+    private onBackPress(focusKey: string, pressedKeys: PressedKeys) {
+        const component = this.focusableComponents[focusKey];
+        if (!component || !component.focusable) {
+            console.log('onBackPress', 'noComponent or componentNotFocusable');
+            return;
+        }
+        return component.onBackPressHandler && component.onBackPressHandler(pressedKeys);
     }
 
     private onEnterPress(focusKey: string, pressedKeys: PressedKeys) {

@@ -3,10 +3,10 @@ import React, {
     createContext,
     useEffect,
     useRef,
-    type ForwardRefExoticComponent,
     type RefAttributes,
     useState,
     useMemo,
+    ReactElement,
 } from "react";
 import {
     type PublicComponentProps,
@@ -22,16 +22,20 @@ import {
 const contextObj: Record<"parentFocusKey", string> = { parentFocusKey: ROOT_FOCUS_KEY };
 const Context = createContext(contextObj);
 
-type RefComponent<T> = ForwardRefExoticComponent<T & RefAttributes<unknown>>;
+type Component<P = {}> = {
+    (props: P): (ReactElement|null);
+    displayName?: string | undefined;
+}
 
 export const withFocusable = ({
     forgetLastFocusedChild: configForgetLastFocusedChild = false,
     trackChildren: configTrackChildren = false,
     autoRestoreFocus: configAutoRestoreFocus = undefined as undefined | boolean,
     blockNavigationOut: configBlockNavigationOut = false,
-} = {}) => <T, _>(Component: RefComponent<T>) => {
-    const FocusableComponent = (p2: PublicComponentProps & Omit<T, keyof FocusableProps>) => {
+} = {}) => <P, _>(Component: Component<P & RefAttributes<unknown>>) => {
+    const FocusableComponent = (p2: PublicComponentProps & Omit<P, keyof FocusableProps | "ref">) => {
         const noop = () => {};
+        const _onBackPress = () => false as const;
         const {
             // @ts-ignore
             className = "",
@@ -42,6 +46,7 @@ export const withFocusable = ({
             blockNavigationOut = false,
             autoRestoreFocus = true,
             focusable = true,
+            onBackPress = _onBackPress,
             onEnterPress = noop,
             onEnterRelease = noop,
             onBecameFocused = noop,
@@ -92,6 +97,7 @@ export const withFocusable = ({
                 autoRestoreFocus: configAutoRestoreFocus !== undefined ? configAutoRestoreFocus : autoRestoreFocus,
                 focusable,
                 onEnterReleaseHandler: () => onEnterRelease(receivedProps),
+                onBackPressHandler: (pressedKeys) => onBackPress(receivedProps, pressedKeys),
                 onEnterPressHandler: (pressedKeys) => onEnterPress(receivedProps, pressedKeys),
                 onArrowPressHandler: (dir, pressedKeys) => onArrowPress(dir, receivedProps, pressedKeys),
                 onBecameBlurredHandler: (layout, details) => onBecameBlurred(layout, receivedProps, details),
@@ -117,7 +123,7 @@ export const withFocusable = ({
         })
         return (
             <Context.Provider value={{parentFocusKey: realFocusKey}}>
-                <Component {...props as T} {...receivedProps} ref={ref}/>
+                <Component {...props as P} {...receivedProps} ref={ref}/>
             </Context.Provider>
         );
     };
