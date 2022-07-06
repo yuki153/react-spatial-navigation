@@ -14,8 +14,9 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          node-version: '16.13.0'
       - uses: actions/setup-node@v1
+        with:
+          node-version: '16.13.0'
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
