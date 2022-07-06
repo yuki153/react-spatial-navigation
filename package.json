@@ -5,26 +5,18 @@
   "main": "dist/index.js",
   "license": "MIT",
   "types": "types/lib/index.d.ts",
-  "files": [
-    "dist",
-    "types/lib/*",
-    "LICENSE"
-  ],
+  "files": ["dist", "types/lib/*", "LICENSE"],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && cross-env DEBUG=\"1\" vite build",
+    "release": "shipjs prepare",
     "serve": "vite preview"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuki153/react-spatial-navigation.git"
   },
-  "keywords": [
-    "react",
-    "spatial-navigation",
-    "hoc",
-    "typescript"
-  ],
+  "keywords": ["react", "spatial-navigation", "hoc", "typescript"],
   "devDependencies": {
     "@babel/core": "^7.17.7",
     "@babel/preset-env": "^7.16.11",
@@ -38,6 +30,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "rollup-plugin-terser": "^7.0.2",
+    "shipjs": "0.24.4",
     "typescript": "^4.6.2",
     "vite": "^2.8.6"
   },
