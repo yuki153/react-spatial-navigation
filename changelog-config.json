@@ -1,0 +1,9 @@
+{
+    "options": {
+        "preset": {
+            "name": "conventionalchangelog",
+            "issuePrefixes": ["TEST-"],
+            "issueUrlFormat": "myBugTracker.com/{prefix}{id}"
+        }
+    }
+}
