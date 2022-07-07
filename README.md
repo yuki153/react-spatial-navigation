@@ -4,6 +4,14 @@
 
 @noriginmedia/react-spatial-navigation を TypeScript で書き直し React 17 に対応させました。hooks ではなく HOC base なライブラリです。
 
+## 本ドキュメントにおける用語定義
+
+|用語|用語が指す意味|
+|--|--|
+|オリジナル|@noriginmedia/react-spatial-navigation|
+|FocusableComponent|withFocusable (HighOrderComponent) 関数から return されたコンポーネント|
+|WrappedComponent|withFocusable 関数の引数に forwardRef と共に渡すコンポーネント|
+
 ## オリジナルとの差分比較
 
 |比較項目|@noriginmedia/react-spatial-navigation|@yuki153/react-spatial-navigation|
@@ -18,7 +26,7 @@
 
 ## ライブラリの使用方法
 
-基本的な使用方法は [オリジナル](@noriginmedia/react-spatial-navigation)と変わりありません。変更ある部分についてのみ記載。
+基本的な使用方法はオリジナルと変わりありません。変更ある部分についてのみ記載。
 
 ### 初期化
 
@@ -36,6 +44,7 @@ setKeyMap({
   right: [39, 9003, "ArrowRight"],
   down: [40, 9004, "ArrowDown"],
   enter: [13, 9005, "Enter"],
+  back: [8, 9006, "Backspace"]
 });
 ```
 
@@ -50,7 +59,7 @@ type Props = {
     isSkeleton: boolean;
 } & FocusableProps;
 
-const Sample = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
+const WrappedComponent = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const { children, className, text, isRoundedCorner } = props;
     return (
         // コンポーネントのルート要素に必ず ref を渡してください。
@@ -60,29 +69,76 @@ const Sample = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     );
 }
 // withFocusable の引数に渡すコンポーネントは必ず forwardRef なコンポーネントである必要があります。
-const FocusableSample = withFocusable()(forwardRef(Sample))
+const FocusableComponent = withFocusable()(forwardRef(WrappedComponent))
 ```
 
-### フォーカスされた状態の時に className を付与する
+#### WrappedComponent が受け取る Props
 
-コンポーネントの focus 状態を表す props として `focused` の他に `className` を受け取ることができます。
+ユーザーが任意に渡す Props 以外では下記の Props を受け取ることができます。  
+それぞれ値や関数の説明については [NoriginMedia / react-spatial-navigation - Props passed to Wrapped Component](https://github.com/NoriginMedia/react-spatial-navigation#props-passed-to-wrapped-component) を参照してください。本ライブラリでは加えて、className が受け取れるようになっています。
+
+```ts
+type FocusableProps = {
+    className: "is-spatial-focused" | `${string} is-spatial-focused` | "";
+    focusKey: string | null;
+    realFocusKey: string;
+    parentFocusKey: string;
+    preferredChildFocusKey: string | null;
+    focused: boolean;
+    hasFocusedChild: boolean;
+    setFocus: (focusKey?: string, detail?: any) => void;
+    stealFocus: (detail?: any) => void;
+    navigateByDirection: (dir: "right" | "left" | "down" | "up") => void;
+    pauseSpatialNavigation: () => void;
+    resumeSpatialNavigation: () => void;
+    updateAllSpatialLayouts: () => void;
+};
+```
+
+### className で focus の状態を知る
+
+コンポーネントの focus 状態を表す props として `focused` の他に `className` を受け取ることができます。下記は @emotion/styled の StyledComponent と組み合わせた一例です。`focused` props でも同じことは実現できるため、状況に応じて使い分けられます。
 
 ```tsx
+import styled from "@emotion/styled";
 import { forwardRef, type ForwardedRef } from 'react';
-import { withFocusable, type FocusableProps } from '@yuki153/react-spatial-navigation';
+import { withFocusable, FOCUSED_SELECTOR_NAME, type FocusableProps } from '@yuki153/react-spatial-navigation';
 
-const Component = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const StyledDiv = styled.div`
+  width: 100px;
+  height: 100px;
+  background-color: gray;
+  &${FOCUSED_SELECTOR_NAME} {
+    background-color: yellow;
+  }
+`;
+
+const WrappedComponent = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     const { className, focused } = props;
     return (
         /**
          * このコンポーネントが focus されている時 className には "is-spatial-focused"
-         *   という名前が入ります。focus されていないときは空文字列が入ります。
+         *   という文字列が入ります。focus されていないときは空文字列が入ります。
          */
-        <div className={className} ref={ref} />
+        <StyledDiv className={className} ref={ref} />
     );
 }
+
 // withFocusable の引数に渡すコンポーネントは必ず forwardRef なコンポーネントである必要があります。
-const FocusableComponent = withFocusable()(forwardRef(Component))
+const FocusableComponent = withFocusable()(forwardRef(WrappedComponent));
+```
+
+### Back キーが押された場合のハンドリング
+
+本ライブラリでは、オリジナルには存在しない `onBackPress` をサポートしています。  
+`onEnterPress` 等と同様に関数の引数から WrappedComponent が受け取る props と同じ値を受け取れます。また、`onBackPress` のデフォルトの挙動として、関数実行時 [`stopPropagation()`](https://developer.mozilla.org/ja/docs/Web/API/Event/stopPropagation) が有効となるため window object に back キーを押した keydown event を伝搬しません。もし `onBackPress` の実行時 window object への keydown event の伝搬を有効にしたい場合は、関数内で最後に __`return false`__ してください。
+
+```tsx
+<FocusableComponent onBackPress={(ownProps) => {
+    const { focusKey, setFocus, navigateByDirection, ...props } = ownProps;
+    // back キーを押した場合の処理
+    // ...
+}} />
 ```
 
 ### デバッグ
