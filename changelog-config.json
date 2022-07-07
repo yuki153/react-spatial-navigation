@@ -1,7 +1,7 @@
 {
     "options": {
         "preset": {
-            "name": "conventionalchangelog",
+            "name": "conventionalcommits",
             "types": [
                 {"type": "feat", "section": "Features", "hidden": false},
                 {"type": "fix", "section": "Bug Fixes"},
