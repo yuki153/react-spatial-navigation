@@ -64,7 +64,7 @@ type Details = Partial<Record<"event", KeyboardEvent>>;
 type PressedKeys = { pressedKeys: Partial<Record<string, number>> };
 
 export type FocusableProps = {
-    className: typeof FOCUSED_CLASS_NAME | "";
+    className: typeof FOCUSED_CLASS_NAME | `${string} ${typeof FOCUSED_CLASS_NAME}` | "";
     focusKey: string | null,
     realFocusKey: string;
     parentFocusKey: string;
