@@ -1,9 +1,18 @@
 {
     "options": {
         "preset": {
-            "name": "conventionalcommits",
-            "issuePrefixes": ["TEST-"],
-            "issueUrlFormat": "myBugTracker.com/{prefix}{id}"
+            "name": "conventionalchangelog",
+            "types": [
+                {"type": "feat", "section": "Features", "hidden": false},
+                {"type": "fix", "section": "Bug Fixes"},
+                {"type": "perf", "section": "Performance"},
+                {"type": "refactor", "section": "Refactoring"},
+                {"type": "test", "section": "Testing"},
+                {"type": "docs", "section": "Documentation"},
+                {"type": "build", "hidden": true},
+                {"type": "style", "hidden": true},
+                {"type": "chore", "hidden": true}
+            ]
         }
     }
 }
