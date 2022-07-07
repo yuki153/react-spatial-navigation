@@ -1,7 +1,7 @@
 {
     "options": {
         "preset": {
-            "name": "conventionalchangelog",
+            "name": "conventionalcommits",
             "issuePrefixes": ["TEST-"],
             "issueUrlFormat": "myBugTracker.com/{prefix}{id}"
         }
