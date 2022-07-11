@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.2...v1.1.3) (2022-07-11)
+
+
+### Bug Fixes
+
+* 🐛 props として渡される関数内の state が更新されない ([d859833](https://github.com/yuki153/react-spatial-navigation/commit/d8598334d2b9af8d044fe31bc36178d0d90b12ed))
+
 ## [1.1.2](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.1...v1.1.2) (2022-07-08)
 
 
