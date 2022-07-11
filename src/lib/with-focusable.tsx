@@ -58,8 +58,26 @@ export const withFocusable = ({
         const realFocusKey = useMemo(() => focusKey || issueUniqueId("sn:focusable-item"), []);
         const { parentFocusKey } = useContext(Context);
         const ref = useRef<HTMLElement>(null);
+        const keydownHandlingMethod = useRef({
+            onBackPress,
+            onEnterPress,
+            onEnterRelease,
+            onBecameFocused,
+            onBecameBlurred,
+            onArrowPress,
+        });
         const [focused, setFocused] = useState(false);
         const [hasFocusedChild, setHasFocusedChild] = useState(false);
+
+        // 常に最新の props（methods）を参照する
+        keydownHandlingMethod.current = {
+            onBackPress,
+            onEnterPress,
+            onEnterRelease,
+            onBecameFocused,
+            onBecameBlurred,
+            onArrowPress,
+        };
 
         /**
          * receivedProps が 'T' の SubType でない事を明示化する。ジェネリクス(T)として渡された型（自身）へ as T を用いて変換する
@@ -96,12 +114,12 @@ export const withFocusable = ({
                  */
                 autoRestoreFocus: configAutoRestoreFocus !== undefined ? configAutoRestoreFocus : autoRestoreFocus,
                 focusable,
-                onEnterReleaseHandler: () => onEnterRelease(receivedProps),
-                onBackPressHandler: (pressedKeys) => onBackPress(receivedProps, pressedKeys),
-                onEnterPressHandler: (pressedKeys) => onEnterPress(receivedProps, pressedKeys),
-                onArrowPressHandler: (dir, pressedKeys) => onArrowPress(dir, receivedProps, pressedKeys),
-                onBecameBlurredHandler: (layout, details) => onBecameBlurred(layout, receivedProps, details),
-                onBecameFocusedHandler: (layout, details) => onBecameFocused(layout, receivedProps, details),
+                onEnterReleaseHandler: () => keydownHandlingMethod.current.onEnterRelease(receivedProps),
+                onBackPressHandler: (pressedKeys) => keydownHandlingMethod.current.onBackPress(receivedProps, pressedKeys),
+                onEnterPressHandler: (pressedKeys) => keydownHandlingMethod.current.onEnterPress(receivedProps, pressedKeys),
+                onArrowPressHandler: (dir, pressedKeys) => keydownHandlingMethod.current.onArrowPress(dir, receivedProps, pressedKeys),
+                onBecameBlurredHandler: (layout, details) => keydownHandlingMethod.current.onBecameBlurred(layout, receivedProps, details),
+                onBecameFocusedHandler: (layout, details) => keydownHandlingMethod.current.onBecameFocused(layout, receivedProps, details),
                 onUpdateFocus: (_focused = false) => setFocused(_focused),
                 onUpdateHasFocusedChild: (_hasFocusedChild = false) => setHasFocusedChild(_hasFocusedChild),
             })
@@ -110,7 +128,6 @@ export const withFocusable = ({
 
         useEffect(() => {
             if (isFirstRender.current === false) {
-                // TODO: onEnterPress 関数内の処理が動的に変化する場合、onXxxHandler を update する必要があるかも
                 spatialNavigation.updateFocusable(realFocusKey, {
                     node: ref.current,
                     preferredChildFocusKey,
