@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.3...v1.1.4) (2022-10-24)
+
+
+### Code Refactoring
+
+* 💡 Add Direction, PublicComponentProps to export type ([971ce4f](https://github.com/yuki153/react-spatial-navigation/commit/971ce4fe99760d71caca3f1b13b11340ab5f1a43))
+
 ## [1.1.3](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.2...v1.1.3) (2022-07-11)
 
 
