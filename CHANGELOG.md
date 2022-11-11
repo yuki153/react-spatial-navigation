@@ -1,3 +1,5 @@
+## [1.1.5](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.4...v1.1.5) (2022-11-11)
+
 ## [1.1.4](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.3...v1.1.4) (2022-10-24)
 
 
