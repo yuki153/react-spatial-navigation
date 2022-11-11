@@ -77,6 +77,7 @@ export type FocusableProps = {
     pauseSpatialNavigation: () => void;
     resumeSpatialNavigation: () => void;
     updateAllSpatialLayouts: () => void;
+    getCurrentFocusKey: () => string | null;
 }
 
 export type PublicComponentProps = {
@@ -779,6 +780,10 @@ class SpatialNavigation {
             newComponent.onUpdateFocus(true);
             newComponent.onBecameFocusedHandler(newComponent.layout, details);
         }
+    }
+
+    public getCurrentFocusKey() {
+        return this.focusKey;
     }
 
     /**

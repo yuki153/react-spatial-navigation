@@ -97,6 +97,7 @@ export const withFocusable = ({
             resumeSpatialNavigation: spatialNavigation.resume.bind(spatialNavigation),
             pauseSpatialNavigation: spatialNavigation.pause.bind(spatialNavigation),
             updateAllSpatialLayouts: spatialNavigation.updateAllLayouts.bind(spatialNavigation),
+            getCurrentFocusKey: spatialNavigation.getCurrentFocusKey.bind(spatialNavigation),
         };
 
         useEffect(() => {
