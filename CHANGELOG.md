@@ -1,3 +1,15 @@
+## [1.2.0](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.5...v1.2.0) (2022-11-17)
+
+
+### Features
+
+* 🎸 add autoDelayFocusToChild option ([fb1077b](https://github.com/yuki153/react-spatial-navigation/commit/fb1077b1f49b28e40f00d7c8f3254664675efe6d))
+
+
+### Performance Improvements
+
+* ⚡️ HOC が return するコンポーネントに渡す props 等々を memo 化する ([2b99dbb](https://github.com/yuki153/react-spatial-navigation/commit/2b99dbb361fe0d89c0bde0331db0d1787a47c803))
+
 ## [1.1.5](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.4...v1.1.5) (2022-11-11)
 
 ### Bug Fixes
