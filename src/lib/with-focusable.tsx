@@ -31,6 +31,7 @@ export const withFocusable = ({
     forgetLastFocusedChild: configForgetLastFocusedChild = false,
     trackChildren: configTrackChildren = false,
     autoRestoreFocus: configAutoRestoreFocus = undefined as undefined | boolean,
+    autoDelayFocusToChild: configAutoDelayFocusToChild = false,
     blockNavigationOut: configBlockNavigationOut = false,
 } = {}) => <P, _>(Component: Component<P & RefAttributes<unknown>>) => {
     const FocusableComponent = (p2: PublicComponentProps & Omit<P, keyof FocusableProps | "ref">) => {
@@ -45,6 +46,7 @@ export const withFocusable = ({
             trackChildren = false,
             blockNavigationOut = false,
             autoRestoreFocus = true,
+            autoDelayFocusToChild = false,
             focusable = true,
             onBackPress = _onBackPress,
             onEnterPress = noop,
@@ -83,7 +85,7 @@ export const withFocusable = ({
          * receivedProps が 'T' の SubType でない事を明示化する。ジェネリクス(T)として渡された型（自身）へ as T を用いて変換する
          * TS Error の解消：型 'T' の制約に代入できますが、'T' は制約 'FocusableProps' の別のサブタイプでインスタンス化できることがあります
          */
-        const receivedProps = {
+        const receivedProps = useMemo(() => ({
             className: focused ? (className ? `${className} ${FOCUSED_CLASS_NAME}` : FOCUSED_CLASS_NAME) : className,
             focusKey: focusKey || null,
             realFocusKey,
@@ -98,7 +100,7 @@ export const withFocusable = ({
             pauseSpatialNavigation: spatialNavigation.pause.bind(spatialNavigation),
             updateAllSpatialLayouts: spatialNavigation.updateAllLayouts.bind(spatialNavigation),
             getCurrentFocusKey: spatialNavigation.getCurrentFocusKey.bind(spatialNavigation),
-        };
+        }), [focused, hasFocusedChild, parentFocusKey, preferredChildFocusKey]);
 
         useEffect(() => {
             spatialNavigation.addFocusable({
@@ -114,6 +116,7 @@ export const withFocusable = ({
                  *   configAutoRestoreFocus の値が false の場合でも優先されるようにする。
                  */
                 autoRestoreFocus: configAutoRestoreFocus !== undefined ? configAutoRestoreFocus : autoRestoreFocus,
+                autoDelayFocusToChild: (configAutoDelayFocusToChild || autoDelayFocusToChild),
                 focusable,
                 onEnterReleaseHandler: () => keydownHandlingMethod.current.onEnterRelease(receivedProps),
                 onBackPressHandler: (pressedKeys) => keydownHandlingMethod.current.onBackPress(receivedProps, pressedKeys),
@@ -139,8 +142,11 @@ export const withFocusable = ({
                 isFirstRender.current = false;
             }
         })
+
+        const value = useMemo(() => ({parentFocusKey: realFocusKey}), []);
+
         return (
-            <Context.Provider value={{parentFocusKey: realFocusKey}}>
+            <Context.Provider value={value}>
                 <Component {...props as P} {...receivedProps} ref={ref}/>
             </Context.Provider>
         );

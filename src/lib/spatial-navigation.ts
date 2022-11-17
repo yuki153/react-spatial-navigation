@@ -93,6 +93,7 @@ export type PublicComponentProps = {
     onBecameFocused?: (layout: Component["layout"], ownProps: FocusableProps, details: Details) => void;
     onBecameBlurred?: (layout: Component["layout"], ownProps: FocusableProps, details: Details) => void;
     autoRestoreFocus?: boolean;
+    autoDelayFocusToChild?: boolean;
     preferredChildFocusKey?: string | null;
 }
 
@@ -105,7 +106,8 @@ export type ComponentProps = {
     preferredChildFocusKey: string | null;
     forgetLastFocusedChild: boolean;
     trackChildren: boolean;
-    autoRestoreFocus: Boolean,
+    autoRestoreFocus: Boolean;
+    autoDelayFocusToChild: boolean;
     onBackPressHandler: (pressedKeys: PressedKeys) => void | false;
     onEnterPressHandler: (pressedKeys: PressedKeys) => void;
     onEnterReleaseHandler: () => void;
@@ -691,6 +693,7 @@ class SpatialNavigation {
         forgetLastFocusedChild,
         trackChildren,
         autoRestoreFocus,
+        autoDelayFocusToChild,
         onBackPressHandler,
         onEnterPressHandler,
         onEnterReleaseHandler,
@@ -710,6 +713,7 @@ class SpatialNavigation {
             forgetLastFocusedChild,
             trackChildren,
             autoRestoreFocus,
+            autoDelayFocusToChild,
             onBackPressHandler,
             onEnterPressHandler,
             onEnterReleaseHandler,
@@ -735,6 +739,18 @@ class SpatialNavigation {
          */
         if (focusKey === this.focusKey) {
             this.setFocus(focusKey);
+        }
+        /**
+         * 追加された子の親が既に focus されていた場合に、子に focus する
+         */
+        if (parentFocusKey === this.focusKey) {
+            const parentComponent = this.focusableComponents[parentFocusKey];
+            if (parentComponent && parentComponent.autoDelayFocusToChild) {
+                const { preferredChildFocusKey } = parentComponent;
+                preferredChildFocusKey
+                    ? preferredChildFocusKey === focusKey && this.setFocus(focusKey)
+                    : this.setFocus(focusKey);
+            } 
         }
     }
 
