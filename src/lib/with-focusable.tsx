@@ -31,6 +31,7 @@ export const withFocusable = ({
     forgetLastFocusedChild: configForgetLastFocusedChild = false,
     trackChildren: configTrackChildren = false,
     autoRestoreFocus: configAutoRestoreFocus = undefined as undefined | boolean,
+    autoDelayFocusToChild: configAutoDelayFocusToChild = false,
     blockNavigationOut: configBlockNavigationOut = false,
 } = {}) => <P, _>(Component: Component<P & RefAttributes<unknown>>) => {
     const FocusableComponent = (p2: PublicComponentProps & Omit<P, keyof FocusableProps | "ref">) => {
@@ -45,6 +46,7 @@ export const withFocusable = ({
             trackChildren = false,
             blockNavigationOut = false,
             autoRestoreFocus = true,
+            autoDelayFocusToChild = false,
             focusable = true,
             onBackPress = _onBackPress,
             onEnterPress = noop,
@@ -114,6 +116,7 @@ export const withFocusable = ({
                  *   configAutoRestoreFocus の値が false の場合でも優先されるようにする。
                  */
                 autoRestoreFocus: configAutoRestoreFocus !== undefined ? configAutoRestoreFocus : autoRestoreFocus,
+                autoDelayFocusToChild: (configAutoDelayFocusToChild || autoDelayFocusToChild),
                 focusable,
                 onEnterReleaseHandler: () => keydownHandlingMethod.current.onEnterRelease(receivedProps),
                 onBackPressHandler: (pressedKeys) => keydownHandlingMethod.current.onBackPress(receivedProps, pressedKeys),
@@ -139,6 +142,7 @@ export const withFocusable = ({
                 isFirstRender.current = false;
             }
         })
+
         return (
             <Context.Provider value={{parentFocusKey: realFocusKey}}>
                 <Component {...props as P} {...receivedProps} ref={ref}/>
