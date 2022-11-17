@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.0...v1.2.1) (2022-11-17)
+
+
+### Performance Improvements
+
+* ⚡️ return the memorized FocusableComponent ([f05e17f](https://github.com/yuki153/react-spatial-navigation/commit/f05e17f5c4643cf579b394a0de7d9eaac96833c1))
+
 ## [1.2.0](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.5...v1.2.0) (2022-11-17)
 
 
