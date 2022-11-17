@@ -1,5 +1,13 @@
 ## [1.1.5](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.4...v1.1.5) (2022-11-11)
 
+### Bug Fixes
+
+* 🐛 focusKey not null when removing focusable component ([58f9569](https://github.com/yuki153/react-spatial-navigation/pull/27/commits/58f95699f5781a5121c6983d21eeb8a8e7035fa7))
+
+### Features
+
+* 🎸 add getCurrentFocusKey in FocusableProps ([9963927](https://github.com/yuki153/react-spatial-navigation/pull/27/commits/9963927f21d0e76d807bf0a9d51579d0699ba8a0))
+
 ## [1.1.4](https://github.com/yuki153/react-spatial-navigation/compare/v1.1.3...v1.1.4) (2022-10-24)
 
 
