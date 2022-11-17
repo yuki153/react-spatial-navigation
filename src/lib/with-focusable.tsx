@@ -7,6 +7,7 @@ import React, {
     useState,
     useMemo,
     ReactElement,
+    memo,
 } from "react";
 import {
     type PublicComponentProps,
@@ -85,7 +86,7 @@ export const withFocusable = ({
          * receivedProps が 'T' の SubType でない事を明示化する。ジェネリクス(T)として渡された型（自身）へ as T を用いて変換する
          * TS Error の解消：型 'T' の制約に代入できますが、'T' は制約 'FocusableProps' の別のサブタイプでインスタンス化できることがあります
          */
-        const receivedProps = useMemo(() => ({
+        const receivedProps = {
             className: focused ? (className ? `${className} ${FOCUSED_CLASS_NAME}` : FOCUSED_CLASS_NAME) : className,
             focusKey: focusKey || null,
             realFocusKey,
@@ -100,7 +101,7 @@ export const withFocusable = ({
             pauseSpatialNavigation: spatialNavigation.pause.bind(spatialNavigation),
             updateAllSpatialLayouts: spatialNavigation.updateAllLayouts.bind(spatialNavigation),
             getCurrentFocusKey: spatialNavigation.getCurrentFocusKey.bind(spatialNavigation),
-        }), [focused, hasFocusedChild, parentFocusKey, preferredChildFocusKey]);
+        };
 
         useEffect(() => {
             spatialNavigation.addFocusable({
@@ -143,14 +144,14 @@ export const withFocusable = ({
             }
         })
 
-        const value = useMemo(() => ({parentFocusKey: realFocusKey}), []);
-
         return (
-            <Context.Provider value={value}>
+            <Context.Provider value={{parentFocusKey: realFocusKey}}>
                 <Component {...props as P} {...receivedProps} ref={ref}/>
             </Context.Provider>
         );
     };
 
-    return FocusableComponent;
+    const MemoizeFocusableComponent = memo(FocusableComponent);
+
+    return MemoizeFocusableComponent;
 }
