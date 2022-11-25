@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.1...v1.2.2) (2022-11-25)
+
+
+### Reverts
+
+* Revert "fix: 🐛 focusKey not null when removing focusable component" ([cff6dfc](https://github.com/yuki153/react-spatial-navigation/commit/cff6dfc9fb169c058cebb720f17add9596d0aa8b))
+
 ## [1.2.1](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.0...v1.2.1) (2022-11-17)
 
 
