@@ -146,12 +146,14 @@ const FocusableComponent = withFocusable()(forwardRef(WrappedComponent));
 debug バージョンを公開しているため package.json を以下のように書き換えてください。  
 debug バージョンでは console.log が出力されるようになります。
 
+> ⚠️ debug version へ切り替える場合には ^ や ~ を varsion 指定から取り除いてください。
+
 ```diff
 "dependencies": {
   "react": "@17.0.2",
   "react-dom": "17.0.2",
-- "@yuki153/react-spatial-navigation": "^1.2.4",
-+ "@yuki153/react-spatial-navigation": "^1.2.4-debug",
+- "@yuki153/react-spatial-navigation": "^1.2.5",
++ "@yuki153/react-spatial-navigation": "1.2.5-debug",
 },
 ```
 
