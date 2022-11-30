@@ -1,3 +1,15 @@
+## [1.2.3](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.2...v1.2.3) (2022-11-30)
+
+
+### Bug Fixes
+
+* 🐛 setKeyMap method arg type ([a4b74a0](https://github.com/yuki153/react-spatial-navigation/commit/a4b74a0ff70f376b80148ddd8db33d713f090f8e))
+
+
+### Code Refactoring
+
+* 💡 improve visibility to console log ([8317b4e](https://github.com/yuki153/react-spatial-navigation/commit/8317b4e4b10c8ba90822924a008d820d7d3ba34b))
+
 ## [1.2.2](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.1...v1.2.2) (2022-11-25)
 
 
