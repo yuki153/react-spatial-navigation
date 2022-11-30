@@ -146,7 +146,7 @@ const FocusableComponent = withFocusable()(forwardRef(WrappedComponent));
 debug バージョンを公開しているため package.json を以下のように書き換えてください。  
 debug バージョンでは console.log が出力されるようになります。
 
-> ⚠️ debug version へ切り替える場合には ^ や ~ を varsion 指定から取り除いてください。
+> ⚠︎ debug version へ切り替える場合には ^ や ~ を varsion 指定から取り除いてください。
 
 ```diff
 "dependencies": {
