@@ -143,14 +143,16 @@ const FocusableComponent = withFocusable()(forwardRef(WrappedComponent));
 
 ### デバッグ
 
-import path を変更してください。library 内の console.log が有効になります。
+debug バージョンを公開しているため package.json を以下のように書き換えてください。  
+debug バージョンでは console.log が出力されるようになります。
 
-```tsx
-// before
-import { initNavigation } from '@yuki153/react-spatial-navigation';
-
-// after
-import { initNavigation } from '@yuki153/react-spatial-navigation/debug';
+```diff
+"dependencies": {
+  "react": "@17.0.2",
+  "react-dom": "17.0.2",
+- "@yuki153/react-spatial-navigation": "^1.2.4",
++ "@yuki153/react-spatial-navigation": "^1.2.4-debug",
+},
 ```
 
 ## 開発環境の使用方法
