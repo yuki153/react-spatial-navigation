@@ -1,3 +1,11 @@
+## [1.2.5](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.4...v1.2.5) (2022-11-30)
+
+
+### Documentation
+
+* ✏️ fix how to debug ([85768f9](https://github.com/yuki153/react-spatial-navigation/commit/85768f9f982872e1e8e5a7b027853e93e20a6b8e))
+* ✏️ fix typo ([9b9348c](https://github.com/yuki153/react-spatial-navigation/commit/9b9348cc4df720753976aabc785d2e5651c364b3))
+
 ## [1.2.4](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.3...v1.2.4) (2022-11-30)
 
 
