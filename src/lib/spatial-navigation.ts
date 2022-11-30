@@ -205,7 +205,7 @@ class SpatialNavigation {
         }
     }
 
-    public setKeyMap(keys: typeof DEFAULT_KEY_MAP) {
+    public setKeyMap(keys:  Partial<typeof DEFAULT_KEY_MAP>) {
         this.keyMap = {
             ...DEFAULT_KEY_MAP,
             ...keys
@@ -389,7 +389,7 @@ class SpatialNavigation {
                     const priority = (totalDistancePoints + 1) / (hasOverlap ? OVERLAP_WEIGHT : SEPARATE_GAP_WEIGHT);
                 
                     console.log(
-                        'smartNavigate',
+                        '%c[sortSiblingsByPriority]', 'color:crimson',
                         `distance (primary, secondary, total weighted) for ${sibling.focusKey} relative to ${focusKey} is`,
                         primaryAxisDistance,
                         secondaryAxisDistance,
@@ -397,7 +397,7 @@ class SpatialNavigation {
                     );
                 
                     console.log(
-                        'smartNavigate',
+                        '%c[sortSiblingsByPriority]', 'color:crimson',
                         `priority for ${sibling.focusKey} relative to ${focusKey} is`,
                         priority
                     );
@@ -459,13 +459,12 @@ class SpatialNavigation {
         const preventDefaultNavigation = this.onArrowPress(focusKey, eventType, details);
 
         if (preventDefaultNavigation === false) {
-            console.log('keyDownEventListener', 'default navigation prevented');
+            console.log('%c[keyDownEvent]', 'color:deepskyblue', 'default navigation prevented');
         } else {
             this.onKeyEvent(event, eventType)
         }
     }
 
-    
     private keyUpEvent(event: KeyboardEvent) {
         const focusKey = this.focusKey;
         if (!focusKey || this.paused) {
@@ -508,13 +507,13 @@ class SpatialNavigation {
 
         if (validDirections.indexOf(direction) < 0) {
             console.log(
-                'navigateByDirection',
+                '[navigateByDirection]',
                 `Invalid direction. You passed: \`${direction}\`, but you can use only these: `,
                 validDirections
             );
             return;
         }
-        console.log('navigateByDirection', 'direction', direction);
+        console.log('[navigateByDirection]', 'direction', direction);
         this.smartNavigate(direction, null, details);
     }
 
@@ -533,9 +532,9 @@ class SpatialNavigation {
      * NOTE: オリジナルとの差分として sortSiblingsByPriority 実行前に条件分岐を追加
      **/
     private smartNavigate(direction: Keys, fromParentFocusKey: string | null, details: Details) {
-        console.log('smartNavigate', 'direction', direction);
-        console.log('smartNavigate', 'fromParentFocusKey', fromParentFocusKey);
-        console.log('smartNavigate', 'this.focusKey', this.focusKey);
+        console.log('%c[smartNavigate]', 'color:orange', 'direction', direction);
+        console.log('%c[smartNavigate]', 'color:orange', 'fromParentFocusKey', fromParentFocusKey);
+        console.log('%c[smartNavigate]', 'color:orange', 'this.focusKey', this.focusKey);
 
         const currentFocusKey = fromParentFocusKey || this.focusKey;
 
@@ -552,11 +551,11 @@ class SpatialNavigation {
 
         // currentFocusKey が SN:ROOT だった場合 currentComponent は undefined になる
         if (!currentComponent) {
-            console.log('smartNavigate', 'currentComponent', currentComponent);
+            console.log('%c[smartNavigate]', 'color:orange', 'currentComponent', currentComponent);
             return;
         }
 
-        console.log('smartNavigate', 'currentComponent', currentComponent.focusKey, currentComponent.node);
+        console.log('%c[smartNavigate]', 'color:orange', 'currentComponent', currentComponent.focusKey, currentComponent);
 
         const { parentFocusKey, focusKey, layout } = currentComponent;
 
@@ -650,21 +649,21 @@ class SpatialNavigation {
 
         if (children.length) {
             const { lastFocusedChildKey, preferredChildFocusKey } = targetComponent;
-            console.log('getNextFocusKey', 'lastFocusedChildKey is', lastFocusedChildKey);
-            console.log('getNextFocusKey', 'preferredChildFocusKey is', preferredChildFocusKey);
+            console.log('%c[getNextFocusKey]', 'color:goldenrod', 'lastFocusedChildKey is', lastFocusedChildKey);
+            console.log('%c[getNextFocusKey]', 'color:goldenrod', 'preferredChildFocusKey is', preferredChildFocusKey);
 
             // 1. まず第一に、最後に focus した子要素の focusKey を返します。
             if (lastFocusedChildKey &&
                 !targetComponent.forgetLastFocusedChild &&
                 this.isParticipatingFocusableComponent(lastFocusedChildKey)
             ) {
-                console.log('getNextFocusKey', 'lastFocusedChildKey will be focused', lastFocusedChildKey);
+                console.log('%c[getNextFocusKey]', 'color:goldenrod', 'lastFocusedChildKey will be focused', lastFocusedChildKey);
                 return this.getNextFocusKey(lastFocusedChildKey)
             }
 
             // 2. lastFocusedChild がない場合は、preferredChildFocusKey に focus します。
             if (preferredChildFocusKey && this.isParticipatingFocusableComponent(preferredChildFocusKey)) {
-                console.log('getNextFocusKey', 'preferredChildFocusKey will be focused', preferredChildFocusKey);
+                console.log('%c[getNextFocusKey]', 'color:goldenrod', 'preferredChildFocusKey will be focused', preferredChildFocusKey);
                 return this.getNextFocusKey(preferredChildFocusKey)
             }
 
@@ -674,12 +673,12 @@ class SpatialNavigation {
                 const currentDistance = Math.abs(current.layout.left) + Math.abs(current.layout.top);
                 return currentDistance < prevDistance ? current : prev;
             })
-            console.log('getNextFocusKey', 'childKey will be focused', child.focusKey);
+            console.log('%c[getNextFocusKey]', 'color:goldenrod', 'childKey will be focused', child.focusKey);
             return this.getNextFocusKey(child.focusKey);
         }
 
         // 引数に与えられた focusKey が最下層だった場合、そのまま return する。
-        console.log('getNextFocusKey', 'targetFocusKey', targetFocusKey);
+        console.log('%c[getNextFocusKey]', 'color:goldenrod', 'targetFocusKey', targetFocusKey);
         return targetFocusKey;
     }
 
@@ -806,7 +805,7 @@ class SpatialNavigation {
      * @param focusKey 第一引数の lastFocusedChildKey として登録する focusKey
      */
     private saveLastFocusedChildKey(component: Component, focusKey: string) {
-        console.log('saveLastFocusedChildKey', `${component.focusKey} lastFocusedChildKey set`, focusKey);
+        console.log('%c[saveLastFocusedChildKey]', 'color:limegreen', `parent(${component.focusKey}) lastFocusedChildKey set`, focusKey);
         component.lastFocusedChildKey = focusKey;
     }
 
@@ -894,11 +893,11 @@ class SpatialNavigation {
             return;
         }
         const targetFocusKey = overwriteFocusKey || focusKey;
-        console.log('setFocus', 'targetFocusKey', targetFocusKey);
+        console.log('%c[setFocus]', 'color:gold', 'targetFocusKey', targetFocusKey);
 
         const oldFocusKey = this.focusKey;
         const newFocusKey = this.getNextFocusKey(targetFocusKey);
-        console.log('setFocus', 'newFocusKey', newFocusKey);
+        console.log('%c[setFocus]', 'color:gold', 'newFocusKey', newFocusKey, this.focusableComponents[newFocusKey]);
 
         this.setCurrentFocusedKey(newFocusKey, details);
         this.updateParentsHasFocusedChild(newFocusKey, details);
@@ -908,7 +907,7 @@ class SpatialNavigation {
     private onEnterRelease(focusKey: string) {
         const component = this.focusableComponents[focusKey];
         if (!component || !component.focusable) {
-            console.log("onEnterRelease", 'noComponent or componentNotFocusable');
+            console.log("[onEnterRelease]", 'noComponent or componentNotFocusable');
             return;
         }
         component.onEnterReleaseHandler && component.onEnterReleaseHandler();
@@ -917,7 +916,7 @@ class SpatialNavigation {
     private onBackPress(focusKey: string, pressedKeys: PressedKeys) {
         const component = this.focusableComponents[focusKey];
         if (!component || !component.focusable) {
-            console.log('onBackPress', 'noComponent or componentNotFocusable');
+            console.log('[onBackPress]', 'noComponent or componentNotFocusable');
             return;
         }
         return component.onBackPressHandler && component.onBackPressHandler(pressedKeys);
@@ -926,7 +925,7 @@ class SpatialNavigation {
     private onEnterPress(focusKey: string, pressedKeys: PressedKeys) {
         const component = this.focusableComponents[focusKey];
         if (!component || !component.focusable) {
-            console.log('onEnterPress', 'noComponent or componentNotFocusable');
+            console.log('[onEnterPress]', 'noComponent or componentNotFocusable');
             return;
         }
         component.onEnterPressHandler && component.onEnterPressHandler(pressedKeys);
@@ -935,7 +934,7 @@ class SpatialNavigation {
     private onArrowPress(focusKey: string, direction: DirectionKeys, pressedKeys: PressedKeys): void | false {
         const component = this.focusableComponents[focusKey];
         if (!component) {
-            console.log('onArrowPress', 'noComponent');
+            console.log('[onArrowPress]', 'noComponent');
             return false;
         }
         return component.onArrowPressHandler && component.onArrowPressHandler(direction, pressedKeys);
@@ -983,7 +982,7 @@ class SpatialNavigation {
         const component = this.focusableComponents[focusKey];
 
         if (!component) {
-            console.log("updateFocusable", "noComponnt");
+            console.log("[updateFocusable]", "noComponnt");
         }
 
         component.preferredChildFocusKey = updateOption.preferredChildFocusKey;
