@@ -205,7 +205,7 @@ class SpatialNavigation {
         }
     }
 
-    public setKeyMap(keys: typeof DEFAULT_KEY_MAP) {
+    public setKeyMap(keys:  Partial<typeof DEFAULT_KEY_MAP>) {
         this.keyMap = {
             ...DEFAULT_KEY_MAP,
             ...keys
