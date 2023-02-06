@@ -101,6 +101,7 @@ export type ComponentProps = {
     node: HTMLElement | null;
     focusKey: string;
     parentFocusKey: string;
+    parentFocusKeyTable: Record<string, 1>
     focusable: boolean;
     blockNavigationOut: boolean;
     preferredChildFocusKey: string | null;
@@ -686,6 +687,7 @@ class SpatialNavigation {
         node,
         focusKey,
         parentFocusKey,
+        parentFocusKeyTable,
         focusable,
         blockNavigationOut,
         preferredChildFocusKey,
@@ -706,6 +708,7 @@ class SpatialNavigation {
             node,
             focusKey,
             parentFocusKey,
+            parentFocusKeyTable,
             focusable,
             blockNavigationOut,
             preferredChildFocusKey,
@@ -740,7 +743,7 @@ class SpatialNavigation {
             this.setFocus(focusKey);
         }
         /**
-         * 追加された子の親が既に focus されていた場合に、子に focus する
+         * 追加された子の親が既に focus されていた場合に、子に focus する。
          */
         if (parentFocusKey === this.focusKey) {
             const parentComponent = this.focusableComponents[parentFocusKey];
@@ -750,6 +753,17 @@ class SpatialNavigation {
                     ? preferredChildFocusKey === focusKey && this.setFocus(focusKey)
                     : this.setFocus(focusKey);
             } 
+        }
+
+        /**
+         * 既に子に focus されていた場合、親の hasFocusedChild state を true に更新する。
+         */
+        const focusedComponent = this.focusKey && this.focusableComponents[this.focusKey];
+        const addedComponent = this.focusableComponents[focusKey]; 
+        if (addedComponent && focusedComponent && focusedComponent.parentFocusKeyTable[focusKey]) {
+            trackChildren && onUpdateHasFocusedChild(true);
+            focusable && onBecameFocusedHandler(addedComponent.layout, {});
+            this.parentsHavingFocusedChild.push(focusKey);
         }
     }
 
