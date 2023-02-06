@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.5...v1.2.6) (2023-02-06)
+
+
+### Bug Fixes
+
+* 🐛 hasFocusedChild not updated when mount components first ([6904d3b](https://github.com/yuki153/react-spatial-navigation/commit/6904d3b7a24776cbdfcb630b428c0b0d36c5acb2))
+
 ## [1.2.5](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.4...v1.2.5) (2022-11-30)
 
 
