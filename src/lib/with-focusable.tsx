@@ -20,7 +20,18 @@ import {
     issueUniqueId
 } from "./unique-id";
 
-const contextObj: Record<"parentFocusKey", string> = { parentFocusKey: ROOT_FOCUS_KEY };
+type ContextBase = {
+    parentFocusKey: string;
+    parentFocusKeyTable: Record<string, 1>;
+}
+
+const contextObj: ContextBase = {
+    parentFocusKey: ROOT_FOCUS_KEY,
+    parentFocusKeyTable: {
+        [ROOT_FOCUS_KEY]: 1,
+    }
+};
+
 const Context = createContext(contextObj);
 
 type Component<P = {}> = {
@@ -59,7 +70,7 @@ export const withFocusable = ({
         } = p2;
         const isFirstRender = useRef(true);
         const realFocusKey = useMemo(() => focusKey || issueUniqueId("sn:focusable-item"), []);
-        const { parentFocusKey } = useContext(Context);
+        const { parentFocusKey, parentFocusKeyTable } = useContext(Context);
         const ref = useRef<HTMLElement>(null);
         const keydownHandlingMethod = useRef({
             onBackPress,
@@ -81,6 +92,14 @@ export const withFocusable = ({
             onBecameBlurred,
             onArrowPress,
         };
+
+        const context = {
+            parentFocusKey: realFocusKey,
+            parentFocusKeyTable: {
+                [realFocusKey]: 1 as const,
+                ...parentFocusKeyTable
+            }
+        }
 
         /**
          * receivedProps が 'T' の SubType でない事を明示化する。ジェネリクス(T)として渡された型（自身）へ as T を用いて変換する
@@ -108,6 +127,7 @@ export const withFocusable = ({
                 node: ref.current,
                 focusKey: realFocusKey,
                 parentFocusKey: parentFocusKey,
+                parentFocusKeyTable: parentFocusKeyTable,
                 preferredChildFocusKey,
                 forgetLastFocusedChild: (configForgetLastFocusedChild || forgetLastFocusedChild),
                 trackChildren: (configTrackChildren || trackChildren),
@@ -145,7 +165,7 @@ export const withFocusable = ({
         })
 
         return (
-            <Context.Provider value={{parentFocusKey: realFocusKey}}>
+            <Context.Provider value={context}>
                 <Component {...props as P} {...receivedProps} ref={ref}/>
             </Context.Provider>
         );
