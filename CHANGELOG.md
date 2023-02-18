@@ -1,3 +1,10 @@
+## [1.2.7](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.6...v1.2.7) (2023-02-18)
+
+
+### Bug Fixes
+
+* 🐛 no propagation back key event when not focus components ([c60dcfb](https://github.com/yuki153/react-spatial-navigation/commit/c60dcfbfb906b666d8238718e8fcb2ea79d437a2))
+
 ## [1.2.6](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.5...v1.2.6) (2023-02-06)
 
 
