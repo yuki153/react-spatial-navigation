@@ -931,7 +931,7 @@ class SpatialNavigation {
         const component = this.focusableComponents[focusKey];
         if (!component || !component.focusable) {
             console.log('[onBackPress]', 'noComponent or componentNotFocusable');
-            return;
+            return false;
         }
         return component.onBackPressHandler && component.onBackPressHandler(pressedKeys);
     }
