@@ -1,29 +1,37 @@
 import { ForwardedRef, forwardRef } from "react";
-import { FocusableProps, withFocusable } from "../../lib";
+import { FocusableProps, PublicComponentProps, useFocusable, withFocusable } from "../../lib";
 
 const MainItem = ({ className }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     const space = " ";
-    return <div className={`contentMainItem${className && space + className}`} ref={ref}/>
+    return (
+        <div className={`contentMainItem${className ?  space + className : ""}`} ref={ref}>
+            <div className={className}/>
+            </div>
+        );
 };
 
 const FocusableMainItem = withFocusable()(forwardRef(MainItem))
 
-const Item = ({ className }: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const FocusableItem = () => {
+    const { FocusProvider, ref, className } = useFocusable();
     const space = " ";
-    return <div className={`contentItem${className && space + className}`} ref={ref}/>
+    return (
+        <FocusProvider>
+            <div className={`contentItem${className ? space + className : ""}`} ref={ref}/>
+        </FocusProvider>
+    )
 };
 
-const FocusableItem = withFocusable()(forwardRef(Item))
-
-const ItemsWrpper = (_: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const FocusableItemsWrpper = (props: PublicComponentProps) => {
+    const { FocusProvider, ref } = useFocusable(props);
     return (
-        <div className="contentItems" ref={ref}>
-            {[...Array(5)].map((_, i) => <FocusableItem key={`dasfas-${i}`}/>)}
-        </div>
+        <FocusProvider>
+            <div className="contentItems" ref={ref}>
+                {[...Array(5)].map((_, i) => <FocusableItem key={`dasfas-${i}`}/>)}
+            </div>
+        </FocusProvider>
     );
 };
-
-const FocusableItemsWrpper = withFocusable()(forwardRef(ItemsWrpper))
 
 const Contents = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     return (

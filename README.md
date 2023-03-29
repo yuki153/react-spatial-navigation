@@ -1,34 +1,115 @@
 # react-spatial-navigation
 
-このライブラリは NoriginMedia が開発した [@noriginmedia/react-spatial-navigation](https://github.com/NoriginMedia/react-spatial-navigation) がベースとなります。このような素晴らしいライブラリを公開された NoriginMedia に敬意を表すとともに深く感謝します。
+This library is based on [@noriginmedia/react-spatial-navigation](https://github.com/NoriginMedia/react-spatial-navigation) developed by NoriginMedia. Rewritte in TypeScript to support React 17. We would like to express our respect and deepest gratitude to NoriginMedia for releasing such a wonderful library.
 
-@noriginmedia/react-spatial-navigation を TypeScript で書き直し React 17 に対応させました。hooks ではなく HOC base なライブラリです。
+For Japanese README, click [here 🇯🇵](./README.ja.md).
 
-## 本ドキュメントにおける用語定義
+## Definition terms in this documentation
 
-|用語|用語が指す意味|
+|terms|description|
 |--|--|
-|オリジナル|@noriginmedia/react-spatial-navigation|
-|FocusableComponent|withFocusable (HighOrderComponent) 関数から return されたコンポーネント|
-|WrappedComponent|withFocusable 関数の引数に forwardRef と共に渡すコンポーネント|
+|Original|@noriginmedia/react-spatial-navigation|
+|FocusableComponent|A special component returned from the withFocusable (HighOrderComponent) function.|
+|WrappedComponent|A component to pass along with forwardRef to the argument of the withFocusable function(HOC).|
 
-## オリジナルとの差分比較
+## Difference from original
 
-|比較項目|@noriginmedia/react-spatial-navigation|@yuki153/react-spatial-navigation|
+||@noriginmedia/react-spatial-navigation|@yuki153/react-spatial-navigation|
 |--|--|--|
-|Size (gzip)|16 KB|__5 KB__|
-|React17|対応（17 では非推奨な API の使用有）|__対応__|
-|React Native|対応|非対応|
-|TypeScript|非対応|__対応__|
-|lodash|依存|__非依存__|
-|recompose|依存|__非依存__|
-|debug 機能|充実|最低限|
+|Size (gzip)|16 KB|__6 KB__|
+|React17| supported (using deprecated api) |__supported__|
+|React Native|supported|not supported|
+|TypeScript|not supported|__supported__|
+|lodash|dependent|__independent__|
+|recompose|dependent|__independent__|
+|debug |supported|partially supported|
 
-## ライブラリの使用方法
+## Important changes since v1.3.0
 
-基本的な使用方法はオリジナルと変わりありません。変更ある部分についてのみ記載。
+> ⚠︎ If you are new to this library, you may want to start with "How to Use the Library". The "How to Use the Library" section uses HOC-based code examples prior to v1.3.0.
 
-### 初期化
+FocusableComponent creation using hooks was support in v1.3.0.
+
+Previously, FocusaleComponent was created using withFocusable(HOC), but as of v1.3.0, it is recommended to use `useFocusable`. The two code examples below are written in different ways, but they create exactly the same FocusableComponent.
+
+```tsx
+/** Create a FocusableComponent with HOC **/
+
+import { forwardRef, type ForwardedRef } from 'react';
+import { withFocusable, type FocusableProps } from '@yuki153/react-spatial-navigation';
+
+const WrappedComponent = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+    const { className } = props;
+    return (
+        <div className={className} ref={ref}>
+            <div>Hello World</div>}
+        </div>
+    );
+}
+export const FocusableComponent = withFocusable()(forwardRef(WrappedComponent))
+```
+
+```tsx
+/** Create a FocusableComponent with hooks **/
+
+import { type PublicComponentProps } from '@yuki153/react-spatial-navigation';
+
+export const FocusableComponent = (props: PublicComponentProps) => {
+  const { FocusProvider, ref, className } = useFocusable(props)
+    return (
+      <FocusProvider>
+        <div className={className} ref={ref}>
+            <div>Hello World</div>}
+        </div>
+      </FocusProvider>
+    );
+}
+```
+
+### useFocusable specification
+
+* argments
+  * Basically the same props as "[@noriginmedia/react-spatial-navigation | props applicable to HOC](https://github.com/NoriginMedia/react-spatial-navigation#props-that-can-be-applied-to-hoc)" can be passed as arguments. Additionally, className, autoDelayFocusToChild, and onBackPress can be passed as arguments in this library. The details of each of its properties are described in later sections.
+* returns
+  * You can get the same value as "[Props passed to Wrapped Component](#props-passed-to-wrapped-component)" as the return value. Additionally, `useFocusable` includes `FocusProvider` and `ref` in the return value. These two properties are important for creating a FocusableComponent.
+
+### Creating a FocusableComponent using useFocusable
+
+As in the HOC and hook comparison code example above, use the `FocusProvider` and `ref` obtained from `useFocusable`. The `FocusProvider` must be placed in the ROOT element of the JSX that FocusableComponent returns. This `FocusProvider` is used to convey the focusKey(parentFocusKey) to the child FocusableComponent.
+
+The `ref` is passed to the element you want to make focusable. Usually passed to ROOT elements (exclude FocusProvider) in JSX.
+
+### ClassName that useFocusable receives as an argument
+
+`useFocusable` can receive `className` as an argument and returns `className` as a return value. The behavior is the result of the following code example. So the `className` returned by `useFocusable` will have the string "is-spatial-focused" when `focused` is true. This saves you the trouble of writing logic to check whether `focused` is true or false and give `className` a name that represents the focused state. And "[Know the focus state by className](#know-the-focus-state-by-classname)" explains the same thing.
+
+```tsx
+/** Pass className to arguments **/
+
+const { className, focused } = useFocusable({ className: "hoge" });
+
+// focused: true  -> "hoge is-spatial-focused"
+// focused: false -> "hoge"
+console.log(className);
+```
+
+```tsx
+/** Not pass className to arguments **/
+
+const { className, focused } = useFocusable();
+
+// focused: true  -> "is-spatial-focused"
+// focused: false -> undefined
+console.log(className);
+```
+
+## How to use library
+
+The basic usage is the same as the original. Only the different parts are described.
+
+### Initialization
+
+The library must be initialized before creating the FocusableComponent.
 
 ```tsx
 import { initNavigation, setKeyMap } from '@yuki153/react-spatial-navigation';
@@ -36,7 +117,7 @@ import { initNavigation, setKeyMap } from '@yuki153/react-spatial-navigation';
 initNavigation();
 
 /**
- * KeyboardEvent.keyCode または KeyboardEvent.key で取得できる値を複数セット可能です。
+ * You can set multiple values from KeyboardEvent.keyCode and KeyboardEvent.key.
  */
 setKeyMap({
   left: [37, 9001, "ArrowLeft"],
@@ -48,7 +129,7 @@ setKeyMap({
 });
 ```
 
-### フォーカス可能なコンポーネントの作成
+### Create FocusableComponent
 
 ```tsx
 import { forwardRef, type ForwardedRef } from 'react';
@@ -62,28 +143,26 @@ type Props = {
 const WrappedComponent = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const { children, className, text, isRoundedCorner } = props;
     return (
-        // コンポーネントのルート要素に必ず ref を渡してください。
+        // Pass the ref to ROOT element in JSX
         <div className={className} ref={ref}>
           {isSkeleton ? <div className="skeleton"/> : <div>{text}</div>}
         </div>
     );
 }
-// withFocusable の引数に渡すコンポーネントは必ず forwardRef なコンポーネントである必要があります。
+// You must pass the forwardRef component to the withFocusable argument
 const FocusableComponent = withFocusable()(forwardRef(WrappedComponent))
 ```
 
-#### WrappedComponent が受け取る Props
+#### Props passed to Wrapped Component
 
-ユーザーが任意に渡す Props 以外では下記の Props を受け取ることができます。  
-それぞれ値や関数の説明については [NoriginMedia / react-spatial-navigation - Props passed to Wrapped Component](https://github.com/NoriginMedia/react-spatial-navigation#props-passed-to-wrapped-component) を参照してください。本ライブラリでは加えて、className が受け取れるようになっています。
+You can receive the following Props other than the Props that the user gives optionally.  
+See "[NoriginMedia / react-spatial-navigation - Props passed to Wrapped Component](https://github.com/NoriginMedia/react-spatial-navigation#props-passed-to-wrapped-component)" for properties descriptions. Additionally, this library can receive className.
 
 ```ts
 type FocusableProps = {
-    className: "is-spatial-focused" | `${string} is-spatial-focused` | "";
-    focusKey: string | null;
-    realFocusKey: string;
+    className: string | undefined;
+    focusKey: string;
     parentFocusKey: string;
-    preferredChildFocusKey: string | null;
     focused: boolean;
     hasFocusedChild: boolean;
     setFocus: (focusKey?: string, detail?: any) => void;
@@ -95,9 +174,9 @@ type FocusableProps = {
 };
 ```
 
-### className で focus の状態を知る
+### Know the focus state by className
 
-コンポーネントの focus 状態を表す props として `focused` の他に `className` を受け取ることができます。下記は @emotion/styled の StyledComponent と組み合わせた一例です。`focused` props でも同じことは実現できるため、状況に応じて使い分けられます。
+Wrapperd component can receive `className` in addition to `focused` as props representing focus state. Below is an example combined with StyledComponent from @emotion/styled. But, the same thing can be done with "focused" props, so you can use them differently depending on the situation.
 
 ```tsx
 import styled from "@emotion/styled";
@@ -117,8 +196,7 @@ const WrappedComponent = (props: FocusableProps, ref: ForwardedRef<HTMLDivElemen
     const { className, focused } = props;
     return (
         /**
-         * このコンポーネントが focus されている時 className には "is-spatial-focused"
-         *   という文字列が入ります。focus されていないときは空文字列が入ります。
+         * The `className` will have the string "is-spatial-focused" when `focused` is true.
          */
         <StyledDiv className={className} ref={ref} />
     );
@@ -128,25 +206,41 @@ const WrappedComponent = (props: FocusableProps, ref: ForwardedRef<HTMLDivElemen
 const FocusableComponent = withFocusable()(forwardRef(WrappedComponent));
 ```
 
-### Back キーが押された場合のハンドリング
+### Handring when back key pressed
 
-本ライブラリでは、オリジナルには存在しない `onBackPress` をサポートしています。  
-`onEnterPress` 等と同様に関数の引数から WrappedComponent が受け取る props と同じ値を受け取れます。また、`onBackPress` のデフォルトの挙動として、関数実行時 [`stopPropagation()`](https://developer.mozilla.org/ja/docs/Web/API/Event/stopPropagation) が有効となるため window object に back キーを押した keydown event を伝搬しません。もし `onBackPress` の実行時 window object への keydown event の伝搬を有効にしたい場合は、関数内で最後に __`return false`__ してください。
+This library is `onBackPress` supported.  
+Like `onEnterPress` function's arguments, it accepts the same props as WrappedComponent. Also, the default behavior of `onBackPress` is to not propagate the keydown event of a back key press to the window object because [`stopPropagation()`](https://developer.mozilla.org/ja/docs/Web/API/Event/stopPropagation) is enabled when the function is executed. If you want to enable the propagation of keydown events to the window object when `onBackPress` is executed, you must add a __return false__ at the end of the function.
 
 ```tsx
-<FocusableComponent onBackPress={(ownProps) => {
-    const { focusKey, setFocus, navigateByDirection, ...props } = ownProps;
-    // back キーを押した場合の処理
-    // ...
-}} />
+<FocusableComponent
+    onBackPress={(focusableProps) => {
+    const { focusKey, setFocus, navigateByDirection, ...props } = focusableProps;
+        // The logic when back key pressed ...
+    }}
+/>
 ```
 
-### デバッグ
+### autoDelayChildToFocus（default: false）
 
-debug バージョンを公開しているため package.json を以下のように書き換えてください。  
-debug バージョンでは console.log が出力されるようになります。
+This is the property to pass to "config for the `withFocusable`" or "props of FocusableComponent". The default behavior of this library is that executed `setFocus("hoge")` will focus on the FocusaleComponent with "hoge" in the `focusKey` (hereafter called hoge). If the hoge has a child FocusableComponent at a lower level, the child FocusableComponent will be focused, not the hoge.
 
-> ⚠︎ debug version へ切り替える場合には ^ や ~ を varsion 指定から取り除いてください。
+However, if the child FocusableComponent is not yet mounted on the DOM Tree when hoge is focused by setFocus("hoge"), the focus is not shifted to the child but to hoge. autoDelayChildToFocus is useful if you want to automatically shift the focus from the parent to the child regardless of the child's mount timing.
+
+```tsx
+const FocusableComponent = withFocusable(/* config */)(forwardRef(WrappedComponent))
+```
+```tsx
+return (
+  <FocusableComponent autoDelayChildToFocus={true} >
+    <ChildFocusableComponent />
+  </FocusableComponent>
+)
+```
+
+### Debug
+
+Since the debug version is published, please rewrite package.json as follows.  
+The debug version will output console.log.
 
 ```diff
 "dependencies": {
@@ -157,28 +251,28 @@ debug バージョンでは console.log が出力されるようになります�
 },
 ```
 
-## 開発環境の使用方法
+## How to use this repository
 
-開発者がこのライブラリを Clone して修正や動作確認などを行う際の手順を記載。
+How to use for developers to clone this library, modify it, and check its operation.
 
-### 推奨事項
+### Recommendation
 
-- Node.js version = 16.13.0
+* node version is 16.13 or higher
 
-### デモで動作を確認する
+### Check library behavior
 
-demo/main.tsx が entry point として起動します。
+Launch local server from demo/main.tsx as entry point with the following npm script.
 
 ```bash
-# localhost:3000 が起動します
+# Launch local server -> localhost:3000
 yarn dev
 ```
 
-### ライブラリとしてバンドルする
+### bundle the library
 
-lib/index.ts が entry point として vite により bundle されます。
+lib/index.ts is bundle by vite as the entry point.
 
 ```bash
-# vite によって bundle され dist と types ディレクトリが生成されます
+# bundled by vite to create dist and types directories
 yarn build
 ```

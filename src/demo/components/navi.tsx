@@ -14,7 +14,7 @@ const NaviItem = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const { children, className } = props;
     const space = " "
     return (
-        <div className={`naviItem${className && space + className}`} ref={ref}>{children}</div>
+        <div className={`naviItem${className ? space + className: ""}`} ref={ref}>{children}</div>
     )
 }
 
