@@ -3,6 +3,7 @@
  */
 import { spatialNavigation, FOCUSED_SELECTOR_NAME, FOCUSED_CLASS_NAME } from "./spatial-navigation";
 import type { DirectionKeys } from "./spatial-navigation";
+export { useFocusable } from "./use-focusable";
 export { withFocusable } from "./with-focusable";
 export type { FocusableProps, PublicComponentProps } from "./spatial-navigation";
 export type Direction = DirectionKeys;
