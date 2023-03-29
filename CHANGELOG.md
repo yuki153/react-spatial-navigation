@@ -1,3 +1,20 @@
+## [1.3.0](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.7...v1.3.0) (2023-03-29)
+
+
+### Features
+
+* 🎸 add useFocusable ([37314a2](https://github.com/yuki153/react-spatial-navigation/commit/37314a24646b13a1fc2d5277134686087e3518f9))
+
+
+### Code Refactoring
+
+* 💡 removed some properties from focusableProps ([7e3f4da](https://github.com/yuki153/react-spatial-navigation/commit/7e3f4daa406da50ad626006a1228f8473f3b2897))
+
+
+### Documentation
+
+* ✏️ add README.md for English ([cbc81af](https://github.com/yuki153/react-spatial-navigation/commit/cbc81afb129cf7b9ea13ac11d90ca67f8f416e36))
+
 ## [1.2.7](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.6...v1.2.7) (2023-02-18)
 
 
