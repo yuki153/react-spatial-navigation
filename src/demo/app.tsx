@@ -1,6 +1,7 @@
 import { initNavigation } from "../lib";
 import { FocusableNavi } from "./components/navi";
-import { FocusableContents } from "./components/contents";
+import { FocusableContents1 } from "./components/contents1";
+import { FocusableContents2 } from "./components/contents2";
 import { FocusableHeader } from "./components/header";
 
 initNavigation();
@@ -13,11 +14,12 @@ window.addEventListener("keydown", (e) => {
 
 export const App = () => {
     return (
-        <div>
+        <div className="app">
             <FocusableHeader color="#f00"/>
             <div className="flex-wrapper">
                 <FocusableNavi />
-                <FocusableContents />
+                <FocusableContents1 />
+                <FocusableContents2 />
             </div>
         </div>
     )

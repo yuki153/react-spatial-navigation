@@ -33,16 +33,16 @@ const FocusableItemsWrpper = (props: PublicComponentProps) => {
     );
 };
 
-const Contents = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
+const Contents1 = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
     return (
-        <div className="content" ref={ref}>
+        <div className="content1" ref={ref}>
             <FocusableMainItem />
             <p className="text">最後に focus した要素を記憶している列</p>
             <FocusableItemsWrpper />
             <p className="text">最後に focus した要素を記憶していない列</p>
             <FocusableItemsWrpper forgetLastFocusedChild={true}/>
         </div>
-    )
+    );
 };
 
-export const FocusableContents = withFocusable()(forwardRef(Contents))
+export const FocusableContents1 = withFocusable()(forwardRef(Contents1));
