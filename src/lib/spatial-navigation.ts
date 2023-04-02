@@ -121,10 +121,6 @@ export type ComponentProps = {
 export type Component = {
     lastFocusedChildKey: null | string;
     layout: {
-        /** 親要素からの x 座標 */
-        x: number;
-        /** 親要素からの y 座標 */
-        y: number;
         /** width */
         width: number;
         /** height */
@@ -725,8 +721,6 @@ class SpatialNavigation {
             onUpdateHasFocusedChild,
             lastFocusedChildKey: null,
             layout: {
-                x: 0,
-                y: 0,
                 width: 0,
                 height: 0,
                 left: 0,
@@ -970,10 +964,8 @@ class SpatialNavigation {
         }
         
         const { node } = component;
-        measureLayout(node, (x, y, width, height, left, top) => {
+        measureLayout(node, (width, height, left, top) => {
             component.layout = {
-                x,
-                y,
                 width,
                 height,
                 left,

@@ -1,4 +1,4 @@
-type Callback = (x: number, y: number, width: number, height: number, left: number, top: number) => void;
+type Callback = (width: number, height: number, left: number, top: number) => void;
 
 /** @see https://developer.mozilla.org/ja/docs/Web/API/Node/nodeType */
 const ELEMENT_NODE = 1;
@@ -41,11 +41,8 @@ export const measureLayout = (node: HTMLElement | null, callback: Callback) => {
     const relativeNode = node && node.parentElement;
     
     if (node && relativeNode) {
-        const relativeRect = getRect(relativeNode);
         const { height, width, top, left } = getRect(node);
-        const x = left - relativeRect.left;
-        const y = top - relativeRect.top;
         // TODO: 引数をオブジェクト化して Omit<"node", Component["layout"]> に変更する
-        callback(x, y, width, height, left, top);
+        callback(width, height, left, top);
     }
 };
