@@ -538,11 +538,6 @@ class SpatialNavigation {
             return;
         }
 
-        if (!fromParentFocusKey) {
-            // TODO: 最適化
-            this.updateAllLayouts();
-        }
-
         const currentComponent = this.focusableComponents[currentFocusKey];
 
         // currentFocusKey が SN:ROOT だった場合 currentComponent は undefined になる
@@ -553,6 +548,7 @@ class SpatialNavigation {
 
         console.log('%c[smartNavigate]', 'color:orange', 'currentComponent', currentComponent.focusKey, currentComponent);
 
+        this.updateLayout(currentComponent.focusKey);
         const { parentFocusKey, focusKey, layout } = currentComponent;
 
         const isVertical = direction === DIRECTION_DOWN || direction === DIRECTION_UP;
@@ -571,6 +567,7 @@ class SpatialNavigation {
         for (let i = 0; i < focusKeys.length; i++) {
             const component = this.focusableComponents[focusKeys[i]];
             if (component.parentFocusKey === parentFocusKey && component.focusable) {
+                this.updateLayout(component.focusKey);
                 const destinationCoordinate = this.getDestinationCoordinate(isVertical, isIncremental, component.layout);
 
                 const isFocusable = isIncremental ? 
@@ -583,15 +580,6 @@ class SpatialNavigation {
             }
         }
 
-        // if (this.debug) {
-        //     this.log('smartNavigate', 'currentCutoffCoordinate', currentCutoffCoordinate);
-        //     this.log(
-        //         'smartNavigate', 'siblings', `${siblings.length} elements:`,
-        //         siblings.map((sibling) => sibling.focusKey).join(', '),
-        //         siblings.map((sibling) => sibling.node)
-        //     );
-        // }
-
         if (focusableSiblings.length) {
 
             const sortedSiblings = this.sortSiblingsByPriority(
@@ -602,7 +590,7 @@ class SpatialNavigation {
             );
 
             const nextComponent = sortedSiblings[0];
-            this.setFocus(nextComponent.focusKey, undefined, details);
+            this.__setFocus(nextComponent.focusKey, details);
         } else {
             const parentComponent = this.focusableComponents[parentFocusKey];
             if (parentComponent) {
@@ -661,6 +649,10 @@ class SpatialNavigation {
             if (preferredChildFocusKey && this.isParticipatingFocusableComponent(preferredChildFocusKey)) {
                 console.log('%c[getNextFocusKey]', 'color:goldenrod', 'preferredChildFocusKey will be focused', preferredChildFocusKey);
                 return this.getNextFocusKey(preferredChildFocusKey)
+            }
+
+            for (let i = 0; i < children.length; i++) {
+                this.updateLayout(children[i].focusKey);
             }
 
             // 3. それ以外の場合、最も原点（x:0, y:0）に近い子要素へ focus します。
@@ -733,7 +725,7 @@ class SpatialNavigation {
          * If for some reason this component was already focused before it was added, call the update
          */
         if (focusKey === this.focusKey) {
-            this.setFocus(focusKey);
+            this.__setFocus(focusKey);
         }
         /**
          * 追加された子の親が既に focus されていた場合に、子に focus する。
@@ -743,8 +735,8 @@ class SpatialNavigation {
             if (parentComponent && parentComponent.autoDelayFocusToChild) {
                 const { preferredChildFocusKey } = parentComponent;
                 preferredChildFocusKey
-                    ? preferredChildFocusKey === focusKey && this.setFocus(focusKey)
-                    : this.setFocus(focusKey);
+                    ? preferredChildFocusKey === focusKey && this.__setFocus(focusKey)
+                    : this.__setFocus(focusKey);
             } 
         }
 
@@ -772,7 +764,7 @@ class SpatialNavigation {
             if (parentComponent) {
                 parentComponent.lastFocusedChildKey = focusKey
                     && (parentComponent.lastFocusedChildKey = null);
-                isFocused && parentComponent.autoRestoreFocus && this.setFocus(parentFocusKey);
+                isFocused && parentComponent.autoRestoreFocus && this.__setFocus(parentFocusKey);
             }
         }
     }
@@ -870,8 +862,9 @@ class SpatialNavigation {
             const parentFocusKey = parentsWithRemoveFlag[i];
             const parentComponent = this.focusableComponents[parentFocusKey];
             if (parentComponent) {
-                parentComponent.trackChildren && parentComponent.onUpdateHasFocusedChild(false)
-                parentComponent.focusable && parentComponent.onBecameBlurredHandler(parentComponent.layout, details)
+                this.updateLayout(parentComponent.focusKey);
+                parentComponent.trackChildren && parentComponent.onUpdateHasFocusedChild(false);
+                parentComponent.focusable && parentComponent.onBecameBlurredHandler(parentComponent.layout, details);
             }
         }
 
@@ -879,6 +872,7 @@ class SpatialNavigation {
             const parentFocusKey = parentsWithAddFlag[i];
             const parentComponent = this.focusableComponents[parentFocusKey];
             if (parentComponent) {
+                this.updateLayout(parentComponent.focusKey);
                 parentComponent.trackChildren && parentComponent.onUpdateHasFocusedChild(true);
                 parentComponent.focusable && parentComponent.onBecameFocusedHandler(parentComponent.layout, details);
             }
@@ -895,20 +889,26 @@ class SpatialNavigation {
         this.paused = false;
     }
 
-    public setFocus(focusKey: string, overwriteFocusKey?: string, details: Details = {}) {
+    private __setFocus(focusKey: string, details: Details = {}, enableLayoutUpdate: boolean = false) {
         if (!this.enabled) {
             return;
         }
-        const targetFocusKey = overwriteFocusKey || focusKey;
-        console.log('%c[setFocus]', 'color:gold', 'targetFocusKey', targetFocusKey);
-
+        console.log('%c[setFocus]', 'color:gold', 'targetFocusKey', focusKey);
         const oldFocusKey = this.focusKey;
-        const newFocusKey = this.getNextFocusKey(targetFocusKey);
+        const newFocusKey = this.getNextFocusKey(focusKey);
         console.log('%c[setFocus]', 'color:gold', 'newFocusKey', newFocusKey, this.focusableComponents[newFocusKey]);
-
+        if (enableLayoutUpdate) {
+            oldFocusKey && this.updateLayout(oldFocusKey);
+            this.updateLayout(newFocusKey);
+        }
         this.setCurrentFocusedKey(newFocusKey, details);
         this.updateParentsHasFocusedChild(newFocusKey, details);
         oldFocusKey && this.updateParentsLastFocusedChild(oldFocusKey);
+    }
+
+    public setFocus(focusKey: string, overwriteFocusKey?: string, details: Details = {}) {
+        const targetFocusKey = overwriteFocusKey || focusKey;
+        this.__setFocus(targetFocusKey, details, true);
     }
 
     private onEnterRelease(focusKey: string) {
@@ -948,7 +948,7 @@ class SpatialNavigation {
     }
 
     /**
-     * {@link Component} の layout 情報を全て再測定して更新する。  
+     * {@link Component} の layout 情報を全て再測定して更新する。
      */
     public updateAllLayouts() {
         const focusKeys = Object.keys(this.focusableComponents);
