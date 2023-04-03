@@ -18,6 +18,7 @@ const rows = 5;
 
 export const FocusableContents2 = () => {
     const { FocusProvider, ref } = useFocusable();
+
     return (
         <FocusProvider>
             <div className="content2" ref={ref}>
@@ -28,7 +29,16 @@ export const FocusableContents2 = () => {
                                 <tr key={i}>
                                     {
                                         [...Array(rows)].map((_, j) => (
-                                            <FocusableCell className="cell" key={j}>{hiragana[(i * rows) + j]}</FocusableCell>
+                                            <FocusableCell
+                                                className="cell"
+                                                key={j}
+                                                onEnterPress={() => {
+                                                    const key = hiragana[(i * rows) + j];
+                                                    window.alert(key);
+                                                }}
+                                            >
+                                                {hiragana[(i * rows) + j]}
+                                            </FocusableCell>
                                         ))
                                     }
                                 </tr>
