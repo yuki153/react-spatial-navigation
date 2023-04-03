@@ -55,13 +55,13 @@ type LineSegment = {
     }
 };
 
-type Details = Partial<Record<"event", KeyboardEvent>>;
+export type Details = Partial<Record<"event", KeyboardEvent>>;
 
 /**
  * 長押し時の情報を提供する
  * @see https://github.com/NoriginMedia/react-spatial-navigation/pull/55
  **/
-type PressedKeys = { pressedKeys: Partial<Record<string, number>> };
+export type PressedKeys = { pressedKeys: Partial<Record<string, number>> };
 
 export type FocusableProps = {
     className: string | undefined;
@@ -108,12 +108,12 @@ export type ComponentProps = {
     trackChildren: boolean;
     autoRestoreFocus: Boolean;
     autoDelayFocusToChild: boolean;
-    onBackPressHandler: (pressedKeys: PressedKeys) => void | false;
-    onEnterPressHandler: (pressedKeys: PressedKeys) => void;
-    onEnterReleaseHandler: () => void;
-    onArrowPressHandler: (dir: DirectionKeys, pressedKeys: PressedKeys) => void | false;
-    onBecameFocusedHandler: (layout: Component["layout"], details: Details) => void;
-    onBecameBlurredHandler: (layout: Component["layout"], details: Details) => void;
+    getOnBackPress: () => ((pressedKeys: PressedKeys) => void | false) | null;
+    getOnEnterPress: () => ((pressedKeys: PressedKeys) => void) | null;
+    getOnEnterRelease: () => (() => void) | null;
+    getOnArrowPress: () => ((dir: DirectionKeys, pressedKeys: PressedKeys) => void | false) | null;
+    getOnBecameFocused: () => ((layout: Component["layout"], details: Details) => void) | null;
+    getOnBecameBlurred: () => ((layout: Component["layout"], details: Details) => void) | null;
     onUpdateFocus: (bool: boolean) => void;
     onUpdateHasFocusedChild: (bool: boolean) => void;
 }
@@ -642,13 +642,17 @@ class SpatialNavigation {
                 this.isParticipatingFocusableComponent(lastFocusedChildKey)
             ) {
                 console.log('%c[getNextFocusKey]', 'color:goldenrod', 'lastFocusedChildKey will be focused', lastFocusedChildKey);
-                return this.getNextFocusKey(lastFocusedChildKey)
+                const focusKey = this.getNextFocusKey(lastFocusedChildKey);
+                this.updateLayout(focusKey);
+                return focusKey;
             }
 
             // 2. lastFocusedChild がない場合は、preferredChildFocusKey に focus します。
             if (preferredChildFocusKey && this.isParticipatingFocusableComponent(preferredChildFocusKey)) {
                 console.log('%c[getNextFocusKey]', 'color:goldenrod', 'preferredChildFocusKey will be focused', preferredChildFocusKey);
-                return this.getNextFocusKey(preferredChildFocusKey)
+                const focusKey = this.getNextFocusKey(preferredChildFocusKey)
+                this.updateLayout(focusKey);
+                return focusKey;
             }
 
             for (let i = 0; i < children.length; i++) {
@@ -682,12 +686,12 @@ class SpatialNavigation {
         trackChildren,
         autoRestoreFocus,
         autoDelayFocusToChild,
-        onBackPressHandler,
-        onEnterPressHandler,
-        onEnterReleaseHandler,
-        onArrowPressHandler,
-        onBecameFocusedHandler,
-        onBecameBlurredHandler,
+        getOnBackPress,
+        getOnEnterPress,
+        getOnEnterRelease,
+        getOnArrowPress,
+        getOnBecameFocused,
+        getOnBecameBlurred,
         onUpdateFocus,
         onUpdateHasFocusedChild,
     }: ComponentProps) {
@@ -703,12 +707,12 @@ class SpatialNavigation {
             trackChildren,
             autoRestoreFocus,
             autoDelayFocusToChild,
-            onBackPressHandler,
-            onEnterPressHandler,
-            onEnterReleaseHandler,
-            onArrowPressHandler,
-            onBecameFocusedHandler,
-            onBecameBlurredHandler,
+            getOnBackPress,
+            getOnEnterPress,
+            getOnEnterRelease,
+            getOnArrowPress,
+            getOnBecameFocused,
+            getOnBecameBlurred,
             onUpdateFocus,
             onUpdateHasFocusedChild,
             lastFocusedChildKey: null,
@@ -747,7 +751,8 @@ class SpatialNavigation {
         const addedComponent = this.focusableComponents[focusKey]; 
         if (addedComponent && focusedComponent && focusedComponent.parentFocusKeyTable[focusKey]) {
             trackChildren && onUpdateHasFocusedChild(true);
-            focusable && onBecameFocusedHandler(addedComponent.layout, {});
+            const onBecameFocused = getOnBecameFocused();
+            focusable && onBecameFocused && onBecameFocused(addedComponent.layout, {});
             this.parentsHavingFocusedChild.push(focusKey);
         }
     }
@@ -782,7 +787,8 @@ class SpatialNavigation {
         const oldComponent = oldFocusKey && this.focusableComponents[oldFocusKey];
         if (oldComponent && newFocusKey !== oldFocusKey) { 
             oldComponent.onUpdateFocus(false);
-            oldComponent.onBecameBlurredHandler(oldComponent.layout, details);
+            const onBecameBlurred = oldComponent.getOnBecameBlurred();
+            onBecameBlurred && onBecameBlurred(oldComponent.layout, details);
         }
 
         this.focusKey = newFocusKey;
@@ -790,7 +796,8 @@ class SpatialNavigation {
         if (this.focusableComponents[newFocusKey]) {
             const newComponent = this.focusableComponents[newFocusKey]
             newComponent.onUpdateFocus(true);
-            newComponent.onBecameFocusedHandler(newComponent.layout, details);
+            const onBecameFocused = newComponent.getOnBecameFocused();
+            onBecameFocused && onBecameFocused(newComponent.layout, details);
         }
     }
 
@@ -862,9 +869,12 @@ class SpatialNavigation {
             const parentFocusKey = parentsWithRemoveFlag[i];
             const parentComponent = this.focusableComponents[parentFocusKey];
             if (parentComponent) {
-                this.updateLayout(parentComponent.focusKey);
                 parentComponent.trackChildren && parentComponent.onUpdateHasFocusedChild(false);
-                parentComponent.focusable && parentComponent.onBecameBlurredHandler(parentComponent.layout, details);
+                const onBecameBlurred = parentComponent.getOnBecameBlurred();
+                if (parentComponent.focusable && onBecameBlurred) {
+                    this.updateLayout(parentComponent.focusKey);
+                    onBecameBlurred(parentComponent.layout, details);
+                }
             }
         }
 
@@ -872,9 +882,12 @@ class SpatialNavigation {
             const parentFocusKey = parentsWithAddFlag[i];
             const parentComponent = this.focusableComponents[parentFocusKey];
             if (parentComponent) {
-                this.updateLayout(parentComponent.focusKey);
                 parentComponent.trackChildren && parentComponent.onUpdateHasFocusedChild(true);
-                parentComponent.focusable && parentComponent.onBecameFocusedHandler(parentComponent.layout, details);
+                const onBecameFocused = parentComponent.getOnBecameFocused();
+                if (parentComponent.focusable && onBecameFocused) {
+                    this.updateLayout(parentComponent.focusKey);
+                    onBecameFocused(parentComponent.layout, details);
+                }
             }
         }
 
@@ -899,7 +912,7 @@ class SpatialNavigation {
         console.log('%c[setFocus]', 'color:gold', 'newFocusKey', newFocusKey, this.focusableComponents[newFocusKey]);
         if (enableLayoutUpdate) {
             oldFocusKey && this.updateLayout(oldFocusKey);
-            this.updateLayout(newFocusKey);
+            focusKey === newFocusKey && this.updateLayout(newFocusKey);
         }
         this.setCurrentFocusedKey(newFocusKey, details);
         this.updateParentsHasFocusedChild(newFocusKey, details);
@@ -917,7 +930,8 @@ class SpatialNavigation {
             console.log("[onEnterRelease]", 'noComponent or componentNotFocusable');
             return;
         }
-        component.onEnterReleaseHandler && component.onEnterReleaseHandler();
+        const onEnterRelease = component.getOnEnterRelease();
+        onEnterRelease && onEnterRelease();
     }
 
     private onBackPress(focusKey: string, pressedKeys: PressedKeys) {
@@ -926,7 +940,8 @@ class SpatialNavigation {
             console.log('[onBackPress]', 'noComponent or componentNotFocusable');
             return false;
         }
-        return component.onBackPressHandler && component.onBackPressHandler(pressedKeys);
+        const onBackPress = component.getOnBackPress();
+        return onBackPress ? onBackPress(pressedKeys) : false;
     }
 
     private onEnterPress(focusKey: string, pressedKeys: PressedKeys) {
@@ -935,7 +950,8 @@ class SpatialNavigation {
             console.log('[onEnterPress]', 'noComponent or componentNotFocusable');
             return;
         }
-        component.onEnterPressHandler && component.onEnterPressHandler(pressedKeys);
+        const onEnterPress = component.getOnEnterPress();
+        onEnterPress && onEnterPress(pressedKeys);
     }
 
     private onArrowPress(focusKey: string, direction: DirectionKeys, pressedKeys: PressedKeys): void | false {
@@ -944,7 +960,8 @@ class SpatialNavigation {
             console.log('[onArrowPress]', 'noComponent');
             return false;
         }
-        return component.onArrowPressHandler && component.onArrowPressHandler(direction, pressedKeys);
+        const onArrowPress = component.getOnArrowPress();
+        return onArrowPress ? onArrowPress(direction, pressedKeys) : undefined;
     }
 
     /**
