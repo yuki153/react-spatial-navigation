@@ -21,24 +21,38 @@ const NaviItem = (props: Props, ref: ForwardedRef<HTMLDivElement>) => {
 const FocusableNaviItem = withFocusable()(forwardRef(NaviItem));
 
 const Navi = (props: FocusableProps, ref: ForwardedRef<HTMLDivElement>) => {
-    const space = " "
+    const space = " ";
     useEffect(() => {
         props.setFocus();
-    }, [])
+    }, []);
 
     return (
         <div className={`navi${props.hasFocusedChild ? space + "is-focus" : ""}`} ref={ref}>
-            <FocusableNaviItem onEnterPress={() => {
-                window.alert("Fire onEnterPress");
-            }}>onEnterPress</FocusableNaviItem>
-            <FocusableNaviItem onBackPress={() => {
-                window.alert("Fire onBackPress");
-            }}>onBackPress</FocusableNaviItem>
-            <FocusableNaviItem onArrowPress={(dir, { navigateByDirection }) => {
-                navigateByDirection(dir);
-                return false;
-            }}>navigateByDirection</FocusableNaviItem>
-            <FocusableNaviItem>Sample</FocusableNaviItem>
+            <FocusableNaviItem
+                onEnterPress={() => {
+                    window.alert("Fire onEnterPress");
+                }}
+            >
+                onEnterPress
+            </FocusableNaviItem>
+            <FocusableNaviItem
+                onBackPress={() => {
+                    window.alert("Fire onBackPress");
+                }}
+            >
+                onBackPress
+            </FocusableNaviItem>
+            <FocusableNaviItem
+                onArrowPress={(dir, { navigateByDirection }) => {
+                    navigateByDirection(dir);
+                    return false;
+                }}
+            >
+                navigateByDirection
+            </FocusableNaviItem>
+            {[...Array(10)].map((_, i) => (
+                <FocusableNaviItem key={`sample-${i}`}>Sample</FocusableNaviItem>
+            ))}
         </div>
     );
 };

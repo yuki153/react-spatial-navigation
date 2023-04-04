@@ -5,10 +5,14 @@ import {
     useContext,
     useState,
     useEffect,
-    createContext
+    createContext,
 } from "react";
 import {
     type PublicComponentProps,
+    type Component,
+    type Details,
+    type DirectionKeys,
+    type PressedKeys,
     spatialNavigation,
     FOCUSED_CLASS_NAME,
     ROOT_FOCUS_KEY,
@@ -30,8 +34,6 @@ const contextObj: ContextBase = {
 const Context = createContext(contextObj);
 
 export const useFocusable = <T extends HTMLElement = HTMLDivElement>(args: PublicComponentProps = {}) => {
-    const noop = () => { };
-    const _onBackPress = () => false as const;
     const {
         className,
         focusKey = null,
@@ -42,38 +44,20 @@ export const useFocusable = <T extends HTMLElement = HTMLDivElement>(args: Publi
         autoRestoreFocus = true,
         autoDelayFocusToChild = false,
         focusable = true,
-        onBackPress = _onBackPress,
-        onEnterPress = noop,
-        onEnterRelease = noop,
-        onBecameFocused = noop,
-        onBecameBlurred = noop,
-        onArrowPress = noop,
+        onBackPress = null,
+        onEnterPress = null,
+        onEnterRelease = null,
+        onBecameFocused = null,
+        onBecameBlurred = null,
+        onArrowPress = null,
     } = args;
 
     const ref = useRef<T>(null);
     const isFirstRender = useRef(true);
     const realFocusKey = useMemo(() => focusKey || issueUniqueId("sn:focusable-item"), []);
     const { parentFocusKey, parentFocusKeyTable } = useContext(Context);
-    const keydownHandlingMethod = useRef({
-        onBackPress,
-        onEnterPress,
-        onEnterRelease,
-        onBecameFocused,
-        onBecameBlurred,
-        onArrowPress,
-    });
     const [focused, setFocused] = useState(false);
     const [hasFocusedChild, setHasFocusedChild] = useState(false);
-
-    // 常に最新の props（methods）を参照する
-    keydownHandlingMethod.current = {
-        onBackPress,
-        onEnterPress,
-        onEnterRelease,
-        onBecameFocused,
-        onBecameBlurred,
-        onArrowPress,
-    };
 
     const focusableProps = {
         className: focused ? (className ? `${className} ${FOCUSED_CLASS_NAME}` : FOCUSED_CLASS_NAME) : className,
@@ -90,6 +74,20 @@ export const useFocusable = <T extends HTMLElement = HTMLDivElement>(args: Publi
         getCurrentFocusKey: spatialNavigation.getCurrentFocusKey.bind(spatialNavigation),
     } as const;
 
+    const _keydownHandlingMethod = {
+        onBackPress: onBackPress && ((pressedKeys: PressedKeys) => onBackPress(focusableProps, pressedKeys)),
+        onEnterPress: onEnterPress && ((pressedKeys: PressedKeys) => onEnterPress(focusableProps, pressedKeys)),
+        onEnterRelease: onEnterRelease && (() => onEnterRelease(focusableProps)),
+        onBecameFocused: onBecameFocused && ((layout: Component["layout"], details: Details) => onBecameFocused(layout, focusableProps, details)),
+        onBecameBlurred: onBecameBlurred && ((layout: Component["layout"], details: Details) => onBecameBlurred(layout, focusableProps, details)),
+        onArrowPress: onArrowPress && ((dir: DirectionKeys, pressedKeys: PressedKeys) => onArrowPress(dir, focusableProps, pressedKeys)),
+    }
+
+    const keydownHandlingMethod = useRef(_keydownHandlingMethod);
+
+    // 常に最新の props（methods）を参照する
+    keydownHandlingMethod.current = _keydownHandlingMethod,
+
     useEffect(() => {
         spatialNavigation.addFocusable({
             node: ref.current,
@@ -103,12 +101,12 @@ export const useFocusable = <T extends HTMLElement = HTMLDivElement>(args: Publi
             autoRestoreFocus: autoRestoreFocus,
             autoDelayFocusToChild: autoDelayFocusToChild,
             focusable,
-            onEnterReleaseHandler: () => keydownHandlingMethod.current.onEnterRelease(focusableProps),
-            onBackPressHandler: (pressedKeys) => keydownHandlingMethod.current.onBackPress(focusableProps, pressedKeys),
-            onEnterPressHandler: (pressedKeys) => keydownHandlingMethod.current.onEnterPress(focusableProps, pressedKeys),
-            onArrowPressHandler: (dir, pressedKeys) => keydownHandlingMethod.current.onArrowPress(dir, focusableProps, pressedKeys),
-            onBecameBlurredHandler: (layout, details) => keydownHandlingMethod.current.onBecameBlurred(layout, focusableProps, details),
-            onBecameFocusedHandler: (layout, details) => keydownHandlingMethod.current.onBecameFocused(layout, focusableProps, details),
+            getOnEnterRelease: () => keydownHandlingMethod.current.onEnterRelease,
+            getOnBackPress: () => keydownHandlingMethod.current.onBackPress,
+            getOnEnterPress: () => keydownHandlingMethod.current.onEnterPress,
+            getOnArrowPress: () => keydownHandlingMethod.current.onArrowPress,
+            getOnBecameBlurred: () => keydownHandlingMethod.current.onBecameBlurred,
+            getOnBecameFocused: () => keydownHandlingMethod.current.onBecameFocused,
             onUpdateFocus: (_focused = false) => setFocused(_focused),
             onUpdateHasFocusedChild: (_hasFocusedChild = false) => setHasFocusedChild(_hasFocusedChild),
         })

@@ -4,7 +4,8 @@ import { withFocusable, FocusableProps } from "../../lib";
 const StyledHeader = styled.div<FocusableProps & {color: string}>`
     color: ${(props) => props.color};
     width: 100%;
-    height: 50px;
+    height: 100%;
+    max-height: 100px;
     background-color: ${({ focused }) => focused ? "blue" : "#333"};
 `;
 

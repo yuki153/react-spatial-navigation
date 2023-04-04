@@ -2,17 +2,24 @@ html {
     font-size: 18px;
 }
 
-.flex-wrapper {
+.app {
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100vh;
+}
+
+.flex-wrapper {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    height: 100%;
+    padding: 30px;
 }
 
 .navi {
     min-width: 360px;
     height: 100%;
-    padding: 30px 16px;
-    background-color: #999;
     color: #fff;
     box-sizing: border-box;
 }
@@ -33,17 +40,21 @@ html {
 }
 
 .naviItem + .naviItem {
-    margin-top: 16px;
+    margin-top: 8px;
 }
 
 .text {
     margin-top: 16px;
 }
 
-.content {
+.content1 {
     width: 100%;
     height: 100%;
-    padding: 30px;
+}
+
+.content2 {
+    min-width: max-content;
+    height: 100%;
 }
 
 .contentItems {
@@ -73,5 +84,23 @@ html {
 }
 
 .contentItem.is-spatial-focused {
+    background-color: blue;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    text-align: center;
+    color: #fff;
+}
+
+.cell {
+    background-color: #333;
+    width: 60px;
+    height: 60px;
+    vertical-align: middle;
+}
+
+.cell.is-spatial-focused {
     background-color: blue;
 }
