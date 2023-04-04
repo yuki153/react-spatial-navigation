@@ -1,3 +1,12 @@
+## [1.3.1](https://github.com/yuki153/react-spatial-navigation/compare/v1.3.0...v1.3.1) (2023-04-04)
+
+
+### Performance Improvements
+
+* ⚡️ omit the computation to get relative x,y coordinates ([fb4f9eb](https://github.com/yuki153/react-spatial-navigation/commit/fb4f9eb05e870c9cbd49f034b56cb3e5c00a3d70))
+* ⚡️ optimization of heavily loaded updateLayout ([abf0b0a](https://github.com/yuki153/react-spatial-navigation/commit/abf0b0a5098b0fc866c8cfa13db3d585b593e186))
+* ⚡️ updateLayout is only called for components affected by navigation ([d8039f3](https://github.com/yuki153/react-spatial-navigation/commit/d8039f3e71522c6adc1e12999289616916464b3c))
+
 ## [1.3.0](https://github.com/yuki153/react-spatial-navigation/compare/v1.2.7...v1.3.0) (2023-03-29)
 
 
