@@ -16,7 +16,7 @@ jobs:
           ref: main
       - uses: actions/setup-node@v1
         with:
-          node-version: '16.13.0'
+          node-version: '18.18.2'
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
