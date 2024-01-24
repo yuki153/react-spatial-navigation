@@ -1,13 +1,18 @@
-const path = require("path");
-const react = require("@vitejs/plugin-react");
-const { defineConfig } = require("vite");
-const { babel } = require("@rollup/plugin-babel");
-// const { terser } = require("rollup-plugin-terser");
+import path from "path";
+import { defineConfig } from "vite";
+import babel from "@rollup/plugin-babel";
 
 const FILE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
-module.exports = defineConfig(() => {
+export default defineConfig(() => {
   return {
+    // Inject react-jsx/runtime instead of createElement when transpiling JSX
+    // @see https://vitejs.dev/guide/features.html#jsx
+    // @see https://esbuild.github.io/content-types/#auto-import-for-jsx
+    // @see https://github.com/evanw/esbuild/issues/334#issuecomment-1013374809
+    esbuild: {
+      jsx: "automatic",
+    },
     plugins: [
 
       // terser({
@@ -33,13 +38,14 @@ module.exports = defineConfig(() => {
           }],
         ],
       }),
-      // tsx, jsx ファイルを transpile
-      react(),
     ],
     build: {
       lib: {
         entry: path.resolve(__dirname, "src/lib/index.ts"),
         name: "Lib",
+        // Use CJS-build that will be deprecated due to fact that libraries using react17 is not able to use as ESM.
+        //   The reason they is not able to use as ESM is that react-jsx/runtime can not resolve path.
+        // @see https://vitejs.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated
         formats: ["cjs"],
         fileName: () => `index.js`,
       },
