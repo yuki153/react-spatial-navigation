@@ -767,7 +767,7 @@ class SpatialNavigation {
             const isFocused = focusKey === this.focusKey;
 
             if (parentComponent) {
-                parentComponent.lastFocusedChildKey = focusKey
+                parentComponent.lastFocusedChildKey === focusKey
                     && (parentComponent.lastFocusedChildKey = null);
                 isFocused && parentComponent.autoRestoreFocus && this.__setFocus(parentFocusKey);
             }
