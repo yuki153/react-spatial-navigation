@@ -2,6 +2,7 @@ import React, {
     type RefAttributes,
     ReactElement,
     memo,
+    ReactNode,
 } from "react";
 import {
     type PublicComponentProps,
@@ -10,7 +11,7 @@ import {
 import { useFocusable } from "./use-focusable";
 
 type Component<P = {}> = {
-    (props: P): (ReactElement|null);
+    (props: P): (ReactElement|null|undefined|ReactNode);
     displayName?: string | undefined;
 }
 
