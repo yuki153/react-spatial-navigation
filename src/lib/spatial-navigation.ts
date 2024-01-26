@@ -695,6 +695,9 @@ class SpatialNavigation {
         onUpdateFocus,
         onUpdateHasFocusedChild,
     }: ComponentProps) {
+        if (this.focusableComponents[focusKey]) {
+            console.error("Error: The focusKey(" + focusKey + ") already exists in DOM Tree", this.focusableComponents[focusKey].node);
+        }
         this.focusableComponents[focusKey] = {
             node,
             focusKey,
@@ -1007,7 +1010,8 @@ class SpatialNavigation {
         const component = this.focusableComponents[focusKey];
 
         if (!component) {
-            console.log("[updateFocusable]", "noComponnt");
+            console.error("Error: Due to some reason, the component having focuskey \"" +focusKey+ "\" has removed from focus system. There may have been duplicate focus keys previously");
+            return;
         }
 
         component.preferredChildFocusKey = updateOption.preferredChildFocusKey;
