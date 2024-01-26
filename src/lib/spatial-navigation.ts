@@ -769,7 +769,10 @@ class SpatialNavigation {
             if (parentComponent) {
                 parentComponent.lastFocusedChildKey === focusKey
                     && (parentComponent.lastFocusedChildKey = null);
-                isFocused && parentComponent.autoRestoreFocus && this.__setFocus(parentFocusKey);
+                if (isFocused) {
+                    componentToRemove.onUpdateFocus(false);
+                    parentComponent.autoRestoreFocus && this.__setFocus(parentFocusKey);
+                }
             }
         }
     }
