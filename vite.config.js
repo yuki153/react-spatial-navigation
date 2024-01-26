@@ -57,7 +57,7 @@ export default defineConfig(() => {
       minify: "terser",
       terserOptions: {
         compress: {
-          drop_console: process.env.DEBUG != 1,
+          ...(process.env.DEBUG != 1 ? {pure_funcs: ['console.log']} : {drop_console: false}),
         },
         format: {
           preamble: "/** @license see https://github.com/yuki153/react-spatial-navigation/blob/main/LICENSE */",
