@@ -1,6 +1,6 @@
 {
   "name": "@yuki153/react-spatial-navigation",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "React 17 compatible navigation library rewritten based on @noriginmedia/react-spatial-navigation",
   "main": "dist/index.js",
   "license": "MIT",

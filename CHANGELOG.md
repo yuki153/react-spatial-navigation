@@ -1,3 +1,13 @@
+## [1.3.2](https://github.com/yuki153/react-spatial-navigation/compare/v1.3.1...v1.3.2) (2024-01-26)
+
+
+### Bug Fixes
+
+* error by duplicated focusKey ([4806cfa](https://github.com/yuki153/react-spatial-navigation/commit/4806cfa20774654532dcaabaeeb7337142a5a924))
+* mistaken condition ([3076b97](https://github.com/yuki153/react-spatial-navigation/commit/3076b972df8a63edf58d2913369061a41bfdf3ec))
+* probrem  occurred by react18 ([26ecbb2](https://github.com/yuki153/react-spatial-navigation/commit/26ecbb2524cf6977695329bdb4bcfe36284be871))
+* type error ([35ff20a](https://github.com/yuki153/react-spatial-navigation/commit/35ff20a4d18d9bd72eb2c6b0f908c5c31035d808))
+
 ## [1.3.1](https://github.com/yuki153/react-spatial-navigation/compare/v1.3.0...v1.3.1) (2023-04-04)
 
 
