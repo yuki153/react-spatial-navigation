@@ -53,6 +53,14 @@ export default defineConfig(() => {
       rollupOptions: {
         // 依存関係を外部化
         external: ["react", "react-dom", "react/jsx-runtime"],
+        output: {
+          // The option that added from rollup v2.5.9
+          // @see https://github.com/rollup/rollup/pull/4215
+          generatedCode: {
+            preset: "es2015",
+            constBindings: false,
+          },
+        }
       },
       minify: "terser",
       terserOptions: {
